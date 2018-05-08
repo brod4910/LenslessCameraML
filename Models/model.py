@@ -4,12 +4,10 @@ import torch.nn.functional as F
 
 class Model(nn.Module):
 
-	def __init__(self, feature_layers, num_classes=10):
+	def __init__(self, feature_layers, classifier):
 		super(Model, self).__init__()
 		self.feature_layers = feature_layers
-		self.classifier = nn.Sequential(
-			
-			)
+		self.classifier = classifier
 
 	def forward(self, input):
 		input = self.feature_layers(input)
@@ -32,3 +30,16 @@ def make_layers(layout):
 			layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.ReLU(inplace=True)]
 
 	return nn.Sequential(*layers)
+
+def make_classifier_layers(layout):
+	layers = []
+	for layer in layout:
+		if layer[0] == 'L':
+			layers += [nn.Linear(layer[1], layer[2]), nn.ReLU(inplace= True)]
+		elif layer[0] == 'D':
+			layers += [nn.Dropout()]
+		elif layer[0] == 'FC':
+			layers += [nn.Linear(layer[1], layer[2])]
+
+	return nn.Sequential(*layers)
+
