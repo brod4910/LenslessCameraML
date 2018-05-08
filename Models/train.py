@@ -51,7 +51,46 @@ def train(args, model, device):
 	criterion = torch.nn.CrossEntropyLoss().cuda() if device == "cuda:0" else torch.nn.CrossEntropyLoss()
 
 	for epoch in range(1, args.epoch + 1):
-		train(epoch, args, model, optimizer, criterion, train_loader)
+		train_epoch(epoch, args, model, optimizer, criterion, train_loader, device)
+		test_epoch(model, test_loader, device)
 
 
-def train_epoch(epoch, args, model, optimizer, criterion, train_loader):
+
+def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
+	model.train()
+	correct = 0
+
+	for batch_idx, (data, target) in enumerate(train_loader):
+		data, target = data.to(device), target.to(device)
+		optimizer.zero_grad()
+
+		output = model(data)
+		loss = criterion(output, target)
+
+		loss.backward()
+		optimizer.step()
+
+        if batch_idx % args.log_interval == 0:
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                epoch, batch_idx * len(data), len(train_loader.dataset),
+                100. * batch_idx / len(train_loader), loss.item()))
+
+def test_epoch(model, test_loader, device):
+	model.eval()
+	test_loss = 0
+	correct = 0
+
+	with torch.no_grad():
+		for data, target in train_loader:
+			data, target = data.to(device), target.to(device)
+
+			output = model(data)
+			loss = F.cross_entropy(output, target, size_average=False)
+			test_loss += loss.item()
+			pred = output.data.max(1)[1]
+			correct += pred.eq(target.data).sum()
+
+    test_loss /= len(train_loader.dataset)
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.4f}%)\n'.format(
+        test_loss, correct, len(train_loader.dataset),
+        100. * correct / len(train_loader.dataset)))
