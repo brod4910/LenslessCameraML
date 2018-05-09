@@ -47,6 +47,8 @@ def main():
 
 	network.to(device)
 
+	train(args, network, device)
+
 
 if __name__ == '__main__':
 	main()
