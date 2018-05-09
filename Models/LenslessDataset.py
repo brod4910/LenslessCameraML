@@ -8,7 +8,7 @@ from torch.utils.data import Dataset, DataLoader
 from torchvision import transforms, utils
 from PIL import Image
 
-class LenlessDataset(Dataset):
+class LenslessDataset(Dataset):
 	def __init__(self, csv_file, root_dir, transform= None):
 		self.csv_data = pd.read_csv(csv_file)
 		self.root_dir = root_dir
