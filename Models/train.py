@@ -16,18 +16,22 @@ def train(args, model, device):
             transforms.Resize(args.resize),
             transforms.ToTensor()
             ])
-
+    else:
+        data_transform = transforms.Compose([
+            transforms.ToTensor()
+            ])
+        
     # create both training and testing datasets
     train_dataset = LenslessDataset.LenslessDataset(
         csv_file= args.train_csv,
         root_dir= args.root_dir,
-        transform= data_transform if args.resize is not None else None
+        transform= data_transform
         )
 
     test_dataset = LenslessDataset.LenslessDataset(
         csv_file= args.test_csv,
         root_dir= args.root_dir,
-        transform= data_transform if args.resize is not None else None
+        transform= data_transform
         )
     # use the torch dataloader class to enumerate over the data during training
     train_loader = torch.utils.data.DataLoader(

@@ -25,10 +25,8 @@ class LenslessDataset(Dataset):
 		image = Image.open(img_name)
 		label = self.label_arr[idx]
 
-		if transform is not None:
+		if self.transform is not None:
 			image = self.transform(image)
-		else:
-			image = transforms.ToTensor(image)
 
 		sample = {'image' : image, 'label': label}
 
