@@ -16,21 +16,18 @@ def train(args, model, device):
             transforms.Resize(args.resize),
             transforms.ToTensor()
             ])
-    else:
-        data_transform = transforms.Compose([
-            transforms.ToTensor()
-            ])
+
     # create both training and testing datasets
     train_dataset = LenslessDataset.LenslessDataset(
         csv_file= args.train_csv,
         root_dir= args.root_dir,
-        transform= data_transform
+        transform= data_transform if args.resize is not None else None
         )
 
     test_dataset = LenslessDataset.LenslessDataset(
         csv_file= args.test_csv,
         root_dir= args.root_dir,
-        transform= data_transform
+        transform= data_transform if args.resize is not None else None
         )
     # use the torch dataloader class to enumerate over the data during training
     train_loader = torch.utils.data.DataLoader(
@@ -50,7 +47,7 @@ def train(args, model, device):
     optimizer = optim.SGD(model.parameters(), lr= args.lr, momentum= args.momentum)
     criterion = torch.nn.CrossEntropyLoss().cuda() if device == "cuda" else torch.nn.CrossEntropyLoss()
 
-    for epoch in range(1, args.epoch + 1):
+    for epoch in range(1, args.epochs + 1):
         train_epoch(epoch, args, model, optimizer, criterion, train_loader, device)
         test_epoch(model, test_loader, device)
 
