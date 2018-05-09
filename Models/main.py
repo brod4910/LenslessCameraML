@@ -40,12 +40,10 @@ def CreateArgsParser():
 def main():
 	args = CreateArgsParser().parse_args()
 
-	network = model.Model(model.make_layers(feature_layers['1']), model.make_classifier_layers(classifier_layers['1']))
-
 	use_cuda = torch.cuda.is_available()
 	device = torch.device("cuda" if use_cuda else "cpu")
 
-	network.to(device)
+	network = model.Model(model.make_layers(feature_layers['1']), model.make_classifier_layers(classifier_layers['1'])).to(device)
 
 	train(args, network, device)
 
