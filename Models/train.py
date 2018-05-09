@@ -20,7 +20,7 @@ def train(args, model, device):
         data_transform = transforms.Compose([
             transforms.ToTensor()
             ])
-        
+
     # create both training and testing datasets
     train_dataset = LenslessDataset.LenslessDataset(
         csv_file= args.train_csv,
@@ -61,11 +61,11 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
     model.train()
     correct = 0
 
-    for batch_idx, (data, target) in enumerate(train_loader):
-        data, target = data.to(device), target.to(device)
+    for batch_idx, data in enumerate(train_loader):
+        input_data, target = data['image'].to(device), data['label'].to(device)
         optimizer.zero_grad()
 
-        output = model(data)
+        output = model(input_data)
         loss = criterion(output, target)
 
         loss.backward()
