@@ -43,7 +43,7 @@ def main():
 	network = model.Model(model.make_layers(feature_layers['1']), model.make_classifier_layers(classifier_layers['1']))
 
 	use_cuda = torch.cuda.is_available()
-	device = torch.device("cuda:0" if use_cuda else "cpu")
+	device = torch.device("cuda" if use_cuda else "cpu")
 
 	network.to(device)
 
