@@ -62,7 +62,7 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
     correct = 0
 
     for batch_idx, data in enumerate(train_loader):
-        input_data, target = data['image'].to(device), data['label'].to(device)
+        input_data, target = data['image'].type(torch.cuda.FloatTensor).to(device), data['label'].to(device)
         optimizer.zero_grad()
 
         output = model(input_data)
@@ -82,8 +82,8 @@ def test_epoch(model, test_loader, device):
     correct = 0
 
     with torch.no_grad():
-        for batch_idx, data in enumerate(train_loader):
-            input_data, target = data['image'].to(device), data['label'].to(device)
+        for batch_idx, data in enumerate(test_loader):
+            input_data, target = data['image'].type(torch.cuda.FloatTensor).to(device), data['label'].to(device)
 
             output = model(data)
             loss = F.cross_entropy(output, target, size_average=False)
