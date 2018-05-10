@@ -13,7 +13,7 @@ def train(args, model, device):
 
     if args.resize is not None:
         data_transform = transforms.Compose([
-            transforms.Resize(args.resize),
+            transforms.Resize((args.resize, args.resize)),
             transforms.ToTensor()
             ])
     else:
