@@ -51,10 +51,16 @@ def train(args, model, device):
     optimizer = optim.SGD(model.parameters(), lr= args.lr, momentum= args.momentum)
     criterion = torch.nn.CrossEntropyLoss().cuda() if device == "cuda" else torch.nn.CrossEntropyLoss()
 
+    if args.lr_scheduler is True:
+        print('Using LR scheduler on loss Plateau')
+        scheduler = optim.ReduceLROnPlateau(optimizer, mode= 'min', verbose= True, patience= 5)
+
     for epoch in range(1, args.epochs + 1):
         train_epoch(epoch, args, model, optimizer, criterion, train_loader, device)
-        test_epoch(model, test_loader, device)
+        test_loss = test_epoch(model, test_loader, device)
 
+        if args.lr_scheduler is True:
+            scheduler.step(test_loss)
 
 
 def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
@@ -95,3 +101,5 @@ def test_epoch(model, test_loader, device):
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.4f}%)\n'.format(
         test_loss, correct, len(test_loader.dataset),
         100. * correct / len(test_loader.dataset)))
+
+    return test_loss
