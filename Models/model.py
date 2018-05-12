@@ -17,8 +17,6 @@ class Model(nn.Module):
 
 def make_layers(layout):
 	layers = []
-	channels = 1
-
 	for layer in layout:
 		if layer[0] == 'A':
 			layers += [nn.AvgPool2d(kernel_size= (layer[1][0], layer[1][1]), stride= layer[2], padding= layer[3])]

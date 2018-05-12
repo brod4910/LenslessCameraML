@@ -13,6 +13,7 @@ feature_layers = {
 	['M', (2,2), 2, 0], ['C', 512, 256, (3,3), 1, 1], 
 	['M', (2,2), 2, 0]],
 
+	# acheived a 92% accuracy on digits 0-9
 	'2': [['C', 1, 128, (3,3), 1, 1], ['C', 128, 256, (3,3), 1, 1], ['C', 256, 256, (3,3), 1, 1], ['C', 256, 512, (3,3), 1, 1], 
 	['M', (2,2), 2, 0], ['C', 512, 128, (3,3), 1, 1], ['C', 128, 256, (3,3), 1, 1], ['C', 256, 512, (3,3), 1, 1], 
 	['M', (2,2), 2, 0], ['C', 512, 128, (3,3), 1, 1], ['C', 128, 256, (3,3), 1, 1], ['C', 256, 512, (3,3), 1, 1], 
@@ -22,9 +23,12 @@ feature_layers = {
 	'3': [['C', 1, 256, (3,3), 1, 1], ['C', 256, 128, (3,3), 1, 1], ['C', 128, 256, (3,3), 1, 1], ['C', 256, 512, (5,5), 1, 2], 
 	['M', (2,2), 2, 0], ['C', 512, 256, (3,3), 1, 1], ['C', 256, 128, (3,3), 1, 1], ['C', 128, 256, (3,3), 1, 1], ['C', 256, 512, (5,5), 1, 2],
 	['M', (2,2), 2, 0], ['C', 512, 256, (3,3), 1, 1], ['C', 256, 128, (3,3), 1, 1], ['C', 128, 256, (3,3), 1, 1], ['C', 256, 512, (5,5), 1, 2],
-	['M', (2,2), 2, 0], ['C', 512, 256, (3,3), 1, 1], ['C', 256, 128, (3,3), 1, 1], ['C', 128, 256, (3,3), 1,1 ], ['C', 256, 512, (5,5), 1, 2],
+	['M', (2,2), 2, 0], ['C', 512, 256, (3,3), 1, 1], ['C', 256, 128, (3,3), 1, 1], ['C', 128, 256, (3,3), 1, 1], ['C', 256, 512, (5,5), 1, 2],
 	['M', (2,2), 2, 0]
 	]
+
+	# model 4 => move the 5x5 conv kernels to the middle 
+	# so that they can have less channels since they are bigger kernels then move the 3x3 to the end
 }
 
 classifier_layers = {
@@ -63,7 +67,13 @@ def main():
 	use_cuda = torch.cuda.is_available()
 	device = torch.device("cuda" if use_cuda else "cpu")
 
-	network = model.Model(model.make_layers(feature_layers['3']), model.make_classifier_layers(classifier_layers['3'])).to(device)
+	network = model.Model(model.make_layers(feature_layers['3']), model.make_classifier_layers(classifier_layers['3']))
+
+	if torch.cuda.device_count() > 1:
+		print("===> Number of GPU's available: %d" % torch.cuda.device_count())
+		network = nn.DataParallel(network)
+
+	network.to(device)
 
 	train(args, network, device)
 
