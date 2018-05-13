@@ -53,7 +53,7 @@ def train(args, model, device):
 
     if args.lr_scheduler is True:
         print('Using LR scheduler on loss Plateau')
-        scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode= 'min', verbose= True, patience= 5)
+        scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode= 'min', verbose= True, patience= 9)
 
     for epoch in range(1, args.epochs + 1):
         train_epoch(epoch, args, model, optimizer, criterion, train_loader, device)
