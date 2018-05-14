@@ -22,7 +22,7 @@ feature_layers = {
     ['M', (2,2), 2, 0], ['C', 512, 256, (3,3), 1, 1, True, True], 
     ['M', (2,2), 2, 0]],
 
-    # acheived a 92% accuracy on digits 0-9
+    # 92% accuracy on digits 0-9
     '2': [['C', 1, 128, (3,3), 1, 1, True, True], ['C', 128, 256, (3,3), 1, 1, True, True], ['C', 256, 256, (3,3), 1, 1, True, True], ['C', 256, 512, (3,3), 1, 1, True, True], 
     ['M', (2,2), 2, 0], ['C', 512, 128, (3,3), 1, 1, True, True], ['C', 128, 256, (3,3), 1, 1, True, True], ['C', 256, 512, (3,3), 1, 1, True, True], 
     ['M', (2,2), 2, 0], ['C', 512, 128, (3,3), 1, 1, True, True], ['C', 128, 256, (3,3), 1, 1, True, True], ['C', 256, 512, (3,3), 1, 1, True, True], 
@@ -101,7 +101,7 @@ def main():
         print("===> Number of GPU's available: %d" % torch.cuda.device_count())
         network = nn.DataParallel(network)
 
-    network.to(device)
+    network = network.to(device)
 
     train(args, network, device)
 

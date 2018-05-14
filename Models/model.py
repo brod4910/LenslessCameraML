@@ -26,9 +26,9 @@ def make_layers(layout):
 			conv2d = nn.Conv2d(in_channels= layer[1], out_channels= layer[2], 
 				kernel_size= (layer[3][0], layer[3][1]), stride= layer[4], padding= layer[5])
 			if layer[6] is True and layer[7] is True:
-				layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.ReLU(inplace=True)]
+				layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.SELU(inplace=True)]
 			elif layer[6] is True and layer[7] is not True:
-				layers += [conv2d, nn.ReLU(inplace= True)]
+				layers += [conv2d, nn.SELU(inplace= True)]
 			else:
 				layers += [conv2d]
 
@@ -38,7 +38,7 @@ def make_classifier_layers(layout):
 	layers = []
 	for layer in layout:
 		if layer[0] == 'L':
-			layers += [nn.Linear(layer[1], layer[2]), nn.ReLU(inplace= True)]
+			layers += [nn.Linear(layer[1], layer[2]), nn.BatchNorm2d(layer[2]), nn.SELU(inplace= True)]
 		elif layer[0] == 'D':
 			layers += [nn.Dropout(layer[1])]
 		elif layer[0] == 'FC':
