@@ -40,7 +40,7 @@ def make_classifier_layers(layout):
 		if layer[0] == 'L':
 			layers += [nn.Linear(layer[1], layer[2]), nn.ReLU(inplace= True)]
 		elif layer[0] == 'D':
-			layers += [nn.Dropout()]
+			layers += [nn.Dropout(layer[1])]
 		elif layer[0] == 'FC':
 			layers += [nn.Linear(layer[1], layer[2])]
 
