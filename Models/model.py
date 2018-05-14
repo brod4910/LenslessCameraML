@@ -25,7 +25,12 @@ def make_layers(layout):
 		elif layer[0] == 'C':
 			conv2d = nn.Conv2d(in_channels= layer[1], out_channels= layer[2], 
 				kernel_size= (layer[3][0], layer[3][1]), stride= layer[4], padding= layer[5])
-			layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.ReLU(inplace=True)]
+			if layer[6] is True and layer[7] is True:
+				layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.ReLU(inplace=True)]
+			elif layer[6] is True and layer[7] is not True:
+				layers += [conv2d, nn.ReLU(inplace= True)]
+			else:
+				layers += [conv2d]
 
 	return nn.Sequential(*layers)
 
