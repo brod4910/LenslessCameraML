@@ -95,7 +95,7 @@ def main():
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
 
-    network = model.Model(model.make_layers(feature_layers['5']), model.make_classifier_layers(classifier_layers['5']))
+    network = model.Model(model.make_layers(feature_layers['6']), model.make_classifier_layers(classifier_layers['6']))
 
     if torch.cuda.device_count() > 1:
         print("===> Number of GPU's available: %d" % torch.cuda.device_count())
