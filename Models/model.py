@@ -38,7 +38,7 @@ def make_classifier_layers(layout):
 	layers = []
 	for layer in layout:
 		if layer[0] == 'L':
-			layers += [nn.Linear(layer[1], layer[2]), nn.BatchNorm2d(layer[2]), nn.SELU(inplace= True)]
+			layers += [nn.Linear(layer[1], layer[2]), nn.SELU(inplace= True)]
 		elif layer[0] == 'D':
 			layers += [nn.Dropout(layer[1])]
 		elif layer[0] == 'FC':
