@@ -52,7 +52,7 @@ def train(args, model, device):
     # set the optimizer depending on choice
     with args.optimizer as opt:
         if opt == 'SGD':
-            optimizer = optim.SGD(model.parameters(), lr= args.lr, momentum= args.momentum, nesterov= True)
+            optimizer = optim.SGD(model.parameters(), lr= args.lr, momentum= args.momentum, dampening=0, weight_decay=0, nesterov= False)
         elif optimizer == 'AdaG':
             optimizer = optim.Adagrad(model.parameters(), lr=0.01, lr_decay=0, weight_decay=0, initial_accumulator_value=0)
         elif opt == 'AdaD':

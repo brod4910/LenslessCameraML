@@ -25,11 +25,16 @@ def CreateArgsParser():
     parser.add_argument('--num-processes', type=int, default=2, metavar='N',
                     help='how many training processes to use (default: 2)')
     # parser.add_argument('--lr-scheduler', action='store_true')
-    parser.add_argument('--plateau', default= 'loss', help= 'Measurement to plateau on. Either loss or accuracy')
-    parser.add_argument('--optimizer', default= 'SGD', help= 'Type of optimizer to use. Options: SGD, AdaG, AdaD, Adam, RMS')
-    parser.add_argument('--root-dir', required= True, help='root directory where enclosing image files are located')
-    parser.add_argument('--train-csv', required= True, help='path to the location of the training csv')
-    parser.add_argument('--test-csv', required= True, help='path to the location of the test csv')
+    parser.add_argument('--plateau', default= 'loss', 
+                    help= 'Measurement to plateau on. Either loss or accuracy')
+    parser.add_argument('--optimizer', default= 'SGD', 
+                    help= 'Type of optimizer to use. Options: SGD, AdaG, AdaD, Adam, RMS')
+    parser.add_argument('--root-dir', required= True,  
+                    help='root directory where enclosing image files are located')
+    parser.add_argument('--train-csv', required= True, 
+                    help='path to the location of the training csv')
+    parser.add_argument('--test-csv', required= True, 
+                    help='path to the location of the test csv')
 
     return parser
 
