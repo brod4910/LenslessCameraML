@@ -122,7 +122,8 @@ def test_epoch(model, test_loader, device):
     # get test metrics to report
     test_loss /= len(test_loader.dataset)
     accuracy = 100.0 * (correct / len(test_loader.dataset))
+    print(accuracy)
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.4f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset), accuracy))
+        test_loss, correct, len(test_loader.dataset), 100.0 * (correct / len(test_loader.dataset))))
 
     return test_loss, accuracy
