@@ -106,6 +106,7 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
 def test_epoch(model, test_loader, device):
     model.eval()
     test_loss = 0
+    accuracy = 0
     correct = 0
 
     # validate the model over the test set and record no gradient history
@@ -124,6 +125,6 @@ def test_epoch(model, test_loader, device):
     accuracy = 100.0 * (correct / len(test_loader.dataset))
     print(accuracy)
     print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.4f}%)\n'.format(
-        test_loss, correct, len(test_loader.dataset), 100.0 * (correct / len(test_loader.dataset))))
+        test_loss, correct, len(test_loader.dataset), 100.0 * correct / len(test_loader.dataset)))
 
     return test_loss, accuracy
