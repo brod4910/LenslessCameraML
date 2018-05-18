@@ -24,6 +24,8 @@ def CreateArgsParser():
                     help='dimensions of both height and width to be resized')
     parser.add_argument('--num-processes', type=int, default=2, metavar='N',
                     help='how many training processes to use (default: 2)')
+    parser.add_argument('--weight-decay', type=int, default=None, metavar='N',
+                    help='L2 decay (default: None)')
     # parser.add_argument('--lr-scheduler', action='store_true')
     parser.add_argument('--plateau', default= 'loss', 
                     help= 'Measurement to plateau on. Either loss or accuracy')
