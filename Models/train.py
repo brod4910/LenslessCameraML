@@ -80,6 +80,7 @@ def train(args, model, device):
             scheduler.step(test_loss)
         elif args.plateau == 'accuracy':
             scheduler.step(accuracy)
+    del criterion, optimizer, scheduler, train_loader, train_dataset, test_loader, test_dataset
 
 
 def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
@@ -117,8 +118,8 @@ def test_epoch(model, test_loader, device):
             output = model(input_data)
             loss = F.cross_entropy(output, target, size_average=False)
             test_loss += loss.item()
-            pred = output.data.max(1)[1]
-            correct += pred.eq(target.data).sum()
+            pred = output.max(1)[1]
+            correct += pred.eq(target).sum()
 
     # get test metrics to report
     test_loss /= len(test_loader.dataset)
