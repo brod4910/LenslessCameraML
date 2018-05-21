@@ -49,15 +49,16 @@ def main():
     hyperparams = []
 
     if args.optimizer == 'SGD':
-        # set the 5 learning rate, weight decay and momentum values for the nets
-        lrs = [args.lr * 100]
-        weight_decays = [args.weight_decay * 100]
-        momentums = [args.momentum + .02]
+        # set the 3 learning rate, weight decay and momentum values for the nets
+        lrs = [args.lr * 10]
+        weight_decays = [args.weight_decay * 10]
+        momentums = [args.momentum + .01]
 
-        for i in range(1, 5):
+        for i in range(1, 3):
             lrs.append(lrs[i-1] * .1)
             weight_decays.append(weight_decays[i-1] * .1)
             momentums.append(momentums[i-1] - .01)
+
         for i in range(len(lrs)):
             for j in range(len(weight_decays)):
                 for k in range(len(momentums)):
