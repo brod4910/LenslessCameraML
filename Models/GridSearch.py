@@ -51,7 +51,7 @@ def main():
     if args.optimizer == 'SGD':
         # set the 3 learning rate, weight decay and momentum values for the nets
         lrs = [args.lr * 10]
-        weight_decays = [args.weight_decay * 10]
+        weight_decays = [args.weight_decay]
         momentums = [args.momentum + .01]
 
         for i in range(1, 3):
