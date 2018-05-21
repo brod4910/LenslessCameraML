@@ -116,15 +116,15 @@ def test_epoch(model, test_loader, device):
             input_data, target = data['image'].type(torch.cuda.FloatTensor).to(device), data['label'].to(device)
 
             output = model(input_data)
-            loss = F.cross_entropy(output, target, size_average=False)
-            test_loss += loss.item()
-            pred = output.max(1)[1]
-            correct += pred.eq(target).sum()
+            # sum up batch loss
+            test_loss += F.cross_entropy(output, target, size_average=False).item()
+            # get the index of the max log-probability
+            pred = output.max(1, keepdim=True)[1]
+            correct += pred.eq(target.view_as(pred)).sum().item()
 
-    # get test metrics to report
     test_loss /= len(test_loader.dataset)
-    accuracy = 100.0 * (correct / len(test_loader.dataset))
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.2%})\n'.format(
-        test_loss, correct, len(test_loader.dataset), 100.0 * correct / len(test_loader.dataset)))
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'
+          .format(test_loss, correct, len(test_loader.dataset),
+                  100. * correct / len(test_loader.dataset)))
 
     return test_loss, accuracy
