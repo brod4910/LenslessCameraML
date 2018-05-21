@@ -48,19 +48,16 @@ def main():
 
     hyperparams = []
 
-    # set the 5 learning rates and weight decay values for the nets
-    lrs = [args.lr * 100]
-    weight_decays = [args.weight_decay * 100]
-    momentums = [args.momentum + .02]
-
-    for i in range(1, 5):
-        lrs.append(lrs[i-1] * .1)
-        weight_decays.append(weight_decays[i-1] * .1)
-        momentums.append(momentums[i-1] - .01)
-
-    print(lrs, weight_decays, momentums)
-
     if args.optimizer == 'SGD':
+        # set the 5 learning rate, weight decay and momentum values for the nets
+        lrs = [args.lr * 100]
+        weight_decays = [args.weight_decay * 100]
+        momentums = [args.momentum + .02]
+
+        for i in range(1, 5):
+            lrs.append(lrs[i-1] * .1)
+            weight_decays.append(weight_decays[i-1] * .1)
+            momentums.append(momentums[i-1] - .01)
         for i in range(len(lrs)):
             for j in range(len(weight_decays)):
                 for k in range(len(momentums)):
@@ -69,9 +66,10 @@ def main():
     # print(hyperparams, len(hyperparams))
 
     for i in range(len(hyperparams)):
-        args.lr = hyperparams[i][0]
-        args.weight_decay = hyperparams[i][1]
-        args.momentum = hyperparams[i][2]
+        if args.optimizer == 'SGD':
+            args.lr = hyperparams[i][0]
+            args.weight_decay = hyperparams[i][1]
+            args.momentum = hyperparams[i][2]
 
         print("Creating net with lr: %.4f , weight decay: %.3f, momentum: %.2f" % (args.lr, args.weight_decay, args.momentum))
 
@@ -85,6 +83,7 @@ def main():
 
         train(args, network, device)
         del network
+        torch.cuda.empty_cache()
 
 
 if __name__ == '__main__':
