@@ -15,7 +15,10 @@ class Wide_Model(nn.Module):
             for branch in section:
                 output = branch(input)
                 outputs += output
-            input = torch.cat(outputs, 1)
+            if len(outputs) == 1:
+                input = outputs[0]
+            else:
+                input = torch.cat(outputs, 1)
         # input = self.feature_layers(input)
         input = input.view(input.size(0), -1)
         input = self.classifier(input)
