@@ -4,15 +4,17 @@ import torch.nn.functional as F
 
 class Wide_Model(nn.Module):
 
-    def __init__(self, feature_layers, classifier):
+    def __init__(self, feature_layers, classifier, device):
         super(Wide_Model, self).__init__()
         self.feature_layers = feature_layers
         self.classifier = classifier
+        self.device = device
 
     def forward(self, input):
         for section in self.feature_layers:
             outputs = []
             for branch in section:
+                branch = branch.to(self.device)
                 output = branch(input)
                 outputs += output
             if len(outputs) == 1:
