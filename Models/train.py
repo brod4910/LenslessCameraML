@@ -8,6 +8,7 @@ import torch.backends.cudnn as cudnn
 import time
 import sys
 import LenslessDataset
+from decimal import Decimal
 
 def train(args, model, device):
 
@@ -123,8 +124,8 @@ def test_epoch(model, test_loader, device):
             correct += pred.eq(target.view_as(pred)).sum().item()
 
     test_loss /= len(test_loader.dataset)
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.0f}%)\n'
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.1f}%)\n'
           .format(test_loss, correct, len(test_loader.dataset),
                   100. * correct / len(test_loader.dataset)))
 
-    return test_loss, accuracy
+    return test_loss, round()

@@ -28,9 +28,9 @@ class Wide_Model(nn.Module):
 
 def make_wide_layers(layout):
     sections = []
-    for section in layout:
+    for __, section in layout.items():
         branches = []
-        for branch in section:
+        for __, branch in section.items():
             layers = []
             for layer in branch:
                 if layer[0] == 'A':
