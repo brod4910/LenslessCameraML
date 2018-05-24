@@ -16,7 +16,7 @@ class Wide_Model(nn.Module):
             for branch in section:
                 branch = branch.to(self.device)
                 output = branch(input)
-                outputs += output
+                outputs.append(output)
             if len(outputs) == 1:
                 input = outputs[0]
             else:
