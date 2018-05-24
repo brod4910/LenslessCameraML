@@ -53,5 +53,7 @@ feature_layers = {
 
 classifier_layers = {
 	
-	'1': [['L', 392 * 13 * 13, 1024, 'ReLU'], ['D', .7], ['L', 1024, 2048, 'ReLU'], ['D', .7], ['FC', 2048, 10]]
+	'1': [['L', 392 * 13 * 13, 1024, 'ReLU'], ['D', .7], ['L', 1024, 2048, 'ReLU'], ['D', .7], ['FC', 2048, 10]],
+	# same model but images are being sized to a higher resolution and downsizing the FC layers
+	'1.5': [['D', .8], ['FC', 392 * 27 * 27, 10]]
 }
