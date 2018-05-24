@@ -68,6 +68,8 @@ def make_classifier_layers(layout):
                 layers += [nn.Linear(layer[1], layer[2]), nn.BatchNorm1d(layer[2]), nn.LeakyReLU(inplace= True)]
         elif layer[0] == 'D':
             layers += [nn.Dropout(layer[1])]
+        elif layer[0] == 'D2d':
+            layers += [nn.Dropout2d(layer[1])]
         elif layer[0] == 'AD':
             layers+= [nn.AlphaDropout(layer[1])]
         elif layer[0] == 'FC':
