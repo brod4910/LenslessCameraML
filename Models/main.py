@@ -53,7 +53,7 @@ def main():
     if args.architecture == 'deep':
         network = make_model.Model(make_model.make_layers(models.feature_layers['2']), make_model.make_classifier_layers(models.classifier_layers['2']))
     elif args.architecture == 'wide':
-        network = make_wide_model.Wide_Model(make_wide_model.make_wide_layers(wide_models.feature_layers['1']), make_wide_model.make_classifier_layers(wide_models.classifier_layers['1']), device)
+        network = make_wide_model.Wide_Model(make_wide_model.make_wide_layers(wide_models.feature_layers['1']), make_wide_model.make_classifier_layers(wide_models.classifier_layers['1.5']), device)
 
     if torch.cuda.device_count() > 1:
         print("===> Number of GPU's available: %d" % torch.cuda.device_count())

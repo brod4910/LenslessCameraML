@@ -62,6 +62,8 @@ def train(args, model, device):
     elif args.optimizer == 'Adam':
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False)
 
+    print("Using optimizer: %s" % (args.optimizer))
+
     # set the Loss function as CrossEntropy
     criterion = torch.nn.CrossEntropyLoss().cuda() if device == "cuda" else torch.nn.CrossEntropyLoss()
 
@@ -70,6 +72,8 @@ def train(args, model, device):
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode= 'min', verbose= True, patience= 6)
     elif args.plateau == 'accuracy':
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode= 'max', verbose= True, patience= 6)
+
+    print("Reducing learning rate on %s plateau" % (args.plateau))
 
     # train and validate the model accordingly
     for epoch in range(1, args.epochs + 1):
