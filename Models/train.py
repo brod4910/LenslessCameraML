@@ -17,6 +17,7 @@ def train(args, model, device):
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor()
             ])
+        print("\nImages resized to %d x %d \n" % (args.resize, args.resize))
     else:
         data_transform = transforms.Compose([
             transforms.ToTensor()
@@ -58,11 +59,11 @@ def train(args, model, device):
     elif args.optimizer == 'AdaD':
         optimizer = optim.Adadelta(model.parameters(), lr=1.0, rho=0.9, eps=1e-06, weight_decay=0)
     elif args.optimizer == 'RMS':
-        optimizer = optim.RMSprop(model.parameters(), lr=0.01, alpha=0.99, eps=1e-08, weight_decay=0, momentum=0, centered=False)
+        optimizer = optim.RMSprop(model.parameters(), lr=args.lr, alpha=0.99, eps=1e-08, weight_decay= 0 if args.weight_decay is None else args.weight_decay, momentum=args.momentum, centered=False)
     elif args.optimizer == 'Adam':
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False)
 
-    print("Using optimizer: %s" % (args.optimizer))
+    print("\nUsing optimizer: %s" % (args.optimizer))
 
     # set the Loss function as CrossEntropy
     criterion = torch.nn.CrossEntropyLoss().cuda() if device == "cuda" else torch.nn.CrossEntropyLoss()
@@ -73,7 +74,7 @@ def train(args, model, device):
     elif args.plateau == 'accuracy':
         scheduler = optim.lr_scheduler.ReduceLROnPlateau(optimizer, mode= 'max', verbose= True, patience= 6)
 
-    print("Reducing learning rate on %s plateau" % (args.plateau))
+    print("\nReducing learning rate on %s plateau\n" % (args.plateau))
 
     # train and validate the model accordingly
     for epoch in range(1, args.epochs + 1):
