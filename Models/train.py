@@ -77,6 +77,7 @@ def train(args, model, device):
     print("\nReducing learning rate on %s plateau\n" % (args.plateau))
 
     # train and validate the model accordingly
+    total_time = time.clock()
     for epoch in range(1, args.epochs + 1):
         train_epoch(epoch, args, model, optimizer, criterion, train_loader, device)
         test_loss, accuracy = test_epoch(model, test_loader, device)
@@ -85,6 +86,8 @@ def train(args, model, device):
             scheduler.step(test_loss)
         elif args.plateau == 'accuracy':
             scheduler.step(accuracy)
+
+    print("The Total Training and Inference time: {:.4f}".format(time.clock() - total_time))
     del criterion, optimizer, scheduler, train_loader, train_dataset, test_loader, test_dataset
 
 
