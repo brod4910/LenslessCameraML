@@ -40,14 +40,16 @@ def train(args, model, device):
         train_dataset, 
         batch_size= args.batch_size, 
         shuffle= True, 
-        num_workers= args.num_processes
+        num_workers= args.num_processes,
+        pin_memory= True
         )
 
     test_loader = torch.utils.data.DataLoader(
         test_dataset,
         batch_size= args.batch_size,
         shuffle= True,
-        num_workers = args.num_processes
+        num_workers = args.num_processes,
+        pin_memory= True
         )
 
     # set the optimizer depending on choice
