@@ -7,9 +7,10 @@ from torchvision import datasets, transforms
 import torch.backends.cudnn as cudnn
 import time
 import sys
+import shutil
 import LenslessDataset
 
-def train(args, model, device):
+def train(args, model, device, checkpoint):
 
     if args.resize is not None:
         data_transform = transforms.Compose([
@@ -53,7 +54,6 @@ def train(args, model, device):
         )
 
     # set the optimizer depending on choice
-    
     if args.optimizer == 'SGD':
         optimizer = optim.SGD(model.parameters(), lr= args.lr, momentum= args.momentum, dampening=0, weight_decay= 0 if args.weight_decay is None else args.weight_decay, nesterov= False)
     elif args.optimizer == 'AdaG':
@@ -65,7 +65,11 @@ def train(args, model, device):
     elif args.optimizer == 'Adam':
         optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False)
 
+    if checkpoint is not None:
+        optimizer.load_state_dict(checkpoint['optimizer'])
+
     print("\nUsing optimizer: %s" % (args.optimizer))
+
 
     # set the Loss function as CrossEntropy
     criterion = torch.nn.CrossEntropyLoss().cuda() if device == "cuda" else torch.nn.CrossEntropyLoss()
@@ -78,20 +82,34 @@ def train(args, model, device):
 
     print("\nReducing learning rate on %s plateau\n" % (args.plateau))
 
+    best_prec1 = 0 if checkpoint is not None else checkpoint['best_prec1']
+    is_best = False
+
     # train and validate the model accordingly
     total_time = time.clock()
-    for epoch in range(1, args.epochs + 1):
+    for epoch in range(args.start_epoch, args.epochs + 1):
         train_epoch(epoch, args, model, optimizer, criterion, train_loader, device)
-        test_loss, accuracy = test_epoch(model, test_loader, device)
+        test_loss, accuracy = test_epoch(model, test_loader, device, is_best)
 
         if args.plateau == 'loss':
             scheduler.step(test_loss)
         elif args.plateau == 'accuracy':
             scheduler.step(accuracy)
 
-    print("The Total Training and Inference time: {:.4f}".format(time.clock() - total_time))
-    del criterion, optimizer, scheduler, train_loader, train_dataset, test_loader, test_dataset
+        if accuracy > best_prec1:
+            best_prec1 = accuracy
+            is_best = True
 
+        # save the model every epoch
+         save_checkpoint({
+            'epoch': epoch,
+            'state_dict': model.state_dict(),
+            'best_prec1': best_prec1,
+            'optimizer' : optimizer.state_dict(),
+            'time': time.clock() - total_time
+        }, is_best)
+
+        is_best = False
 
 def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
     model.train()
@@ -139,3 +157,8 @@ def test_epoch(model, test_loader, device):
                   100. * correct / len(test_loader.dataset)))
 
     return test_loss, accuracy
+
+def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
+    torch.save(state, filename)
+    if is_best:
+        shutil.copyfile(filename, 'model_best.pth.tar')

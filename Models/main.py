@@ -41,11 +41,15 @@ def CreateArgsParser():
                     help='path to the location of the training csv')
     parser.add_argument('--test-csv', required= True, 
                     help='path to the location of the test csv')
+    parser.add_argument('--resume', default= None, 
+                    help='file to load checkpoint from')
+    parser.add_argument('--start-epoch', type=int, default=1)
 
     return parser
 
 def main():
     args = CreateArgsParser().parse_args()
+    checkpoint = None
 
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
@@ -55,13 +59,26 @@ def main():
     elif args.architecture == 'wide':
         network = make_wide_model.Wide_Model(make_wide_model.make_wide_layers(wide_models.feature_layers['1']), make_wide_model.make_classifier_layers(wide_models.classifier_layers['1.5']), device)
 
+    if args.resume is not None:
+        if os.path.isfile(args.resume):
+            print("=> loading checkpoint '{}'".format(args.resume))
+            checkpoint = torch.load(args.resume)
+            args.start_epoch = checkpoint['epoch'] + 1
+            best_prec1 = checkpoint['best_prec1']
+            model.load_state_dict(checkpoint['state_dict'])
+            # optimizer.load_state_dict(checkpoint['optimizer'])
+            print("=> loaded checkpoint '{}' (epoch {})"
+                  .format(args.resume, checkpoint['epoch']))
+        else:
+            print("=> no checkpoint found at '{}'".format(args.resume))
+
     if torch.cuda.device_count() > 1:
         print("===> Number of GPU's available: %d" % torch.cuda.device_count())
         network = nn.DataParallel(network)
 
     network = network.to(device)
 
-    train(args, network, device)
+    train(args, network, device, checkpoint)
 
 
 if __name__ == '__main__':
