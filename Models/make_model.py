@@ -1,6 +1,7 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
+from torch.utils.checkpoint import checkpoint_sequential
 
 class Model(nn.Module):
 
@@ -10,7 +11,7 @@ class Model(nn.Module):
 		self.classifier = classifier
 
 	def forward(self, input):
-		input = self.feature_layers(input)
+		input = checkpoint_sequential(self.feature_layers, 20, input)
 		input = input.view(input.size(0), -1)
 		input = self.classifier(input)
 		return input

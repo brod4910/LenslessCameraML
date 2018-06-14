@@ -1,7 +1,6 @@
 import os
 import torch
 import torch.optim as optim
-from torch.utils.checkpoint import checkpoint_sequential
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torchvision import datasets, transforms
@@ -121,7 +120,7 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
         input_data, target = data['image'].type(torch.cuda.FloatTensor).to(device), data['label'].to(device)
         optimizer.zero_grad()
 
-        output = checkpoint_sequential(model, 22, input_data)
+        output = model(input_data)
         loss = criterion(output, target)
 
         loss.backward()
