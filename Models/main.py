@@ -65,7 +65,7 @@ def main():
             checkpoint = torch.load(args.resume)
             args.start_epoch = checkpoint['epoch'] + 1
             best_prec1 = checkpoint['best_prec1']
-            model.load_state_dict(checkpoint['state_dict'])
+            network.load_state_dict(checkpoint['state_dict'])
             # optimizer.load_state_dict(checkpoint['optimizer'])
             print("=> loaded checkpoint '{}' (epoch {})"
                   .format(args.resume, checkpoint['epoch']))

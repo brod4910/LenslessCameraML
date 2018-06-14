@@ -1,6 +1,7 @@
 import os
 import torch
 import torch.optim as optim
+from torch.utils.checkpoint import checkpoint_sequential
 import torch.nn.functional as F
 from torch.autograd import Variable
 from torchvision import datasets, transforms
@@ -82,14 +83,14 @@ def train(args, model, device, checkpoint):
 
     print("\nReducing learning rate on %s plateau\n" % (args.plateau))
 
-    best_prec1 = 0 if checkpoint is not None else checkpoint['best_prec1']
+    best_prec1 = 0 if checkpoint is None else checkpoint['best_prec1']
     is_best = False
 
     # train and validate the model accordingly
     total_time = time.clock()
     for epoch in range(args.start_epoch, args.epochs + 1):
         train_epoch(epoch, args, model, optimizer, criterion, train_loader, device)
-        test_loss, accuracy = test_epoch(model, test_loader, device, is_best)
+        test_loss, accuracy = test_epoch(model, test_loader, device)
 
         if args.plateau == 'loss':
             scheduler.step(test_loss)
@@ -101,7 +102,7 @@ def train(args, model, device, checkpoint):
             is_best = True
 
         # save the model every epoch
-         save_checkpoint({
+        save_checkpoint({
             'epoch': epoch,
             'state_dict': model.state_dict(),
             'best_prec1': best_prec1,
@@ -120,7 +121,7 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
         input_data, target = data['image'].type(torch.cuda.FloatTensor).to(device), data['label'].to(device)
         optimizer.zero_grad()
 
-        output = model(input_data)
+        output = checkpoint_sequential(model, 22, input_data)
         loss = criterion(output, target)
 
         loss.backward()
