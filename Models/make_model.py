@@ -11,13 +11,16 @@ class Model(nn.Module):
 		self.classifier = classifier
 
 	def forward(self, input):
-		input = checkpoint_sequential(self.feature_layers, 4, input)
+        input = self.feature_layers[0](input)
+		input = checkpoint_sequential(self.feature_layers[1], 4, input)
 		input = input.view(input.size(0), -1)
 		input = self.classifier(input)
 		return input
 
 def make_layers(layout):
 	layers = []
+	exp_flag = True
+	first_layer = None
 	for layer in layout:
 		if layer[0] == 'A':
 			layers += [nn.AvgPool2d(kernel_size= (layer[1][0], layer[1][1]), stride= layer[2], padding= layer[3])]
@@ -27,7 +30,11 @@ def make_layers(layout):
 			conv2d = nn.Conv2d(in_channels= layer[1], out_channels= layer[2], 
 				kernel_size= (layer[3][0], layer[3][1]), stride= layer[4], padding= layer[5])
 			if layer[6] == 'ReLU':
-				layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.ReLU(inplace=True)]
+				if exp_flag is True:
+					first_layer = [conv2d, nn.BatchNorm2d(layer[2]), nn.ReLU(inplace=True)]
+                    exp_flag = False
+				else:
+					layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.ReLU(inplace=True)]
 			elif layer[6] == 'PReLU':
 				layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.PReLU(inplace=True)]
 			elif layer[6] == 'SELU':
@@ -37,7 +44,7 @@ def make_layers(layout):
 			else:
 				layers += [conv2d]
 
-	return nn.Sequential(*layers)
+	return [nn.Sequential(first_layer), nn.Sequential(*layers)]
 
 def make_classifier_layers(layout):
 	layers = []
