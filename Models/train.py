@@ -18,7 +18,7 @@ def train(args, model, device, checkpoint):
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor()
             ])
-        print("\nImages resized to %d x %d \n" % (args.resize, args.resize))
+        print("\nImages resized to %d x %d" % (args.resize, args.resize))
     else:
         data_transform = transforms.Compose([
             transforms.ToTensor()

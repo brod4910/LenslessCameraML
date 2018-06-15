@@ -78,6 +78,8 @@ def main():
 
     network = network.to(device)
 
+    print("\nBatch Size: %d" % (args.batch_size))
+
     train(args, network, device, checkpoint)
 
 

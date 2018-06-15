@@ -11,7 +11,7 @@ class Model(nn.Module):
 		self.classifier = classifier
 
 	def forward(self, input):
-		input = checkpoint_sequential(self.feature_layers, 20, input)
+		input = checkpoint_sequential(self.feature_layers, 4, input)
 		input = input.view(input.size(0), -1)
 		input = self.classifier(input)
 		return input
