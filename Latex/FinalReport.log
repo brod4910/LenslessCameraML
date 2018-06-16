@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  15 JUN 2018 22:35
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  16 JUN 2018 15:43
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -21,7 +21,7 @@ File: ot1ptm.fd 2001/06/04 font definitions for OT1/ptm.
 )
 \@IEEEnormalsizefontbaselineskip=\skip41
 
--- This is a 12 point document.
+-- This is an 11 point document.
 \normalsizebaselineskip=\skip42
 \normaljot=\skip43
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <6> not available
@@ -44,24 +44,24 @@ LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <10> not available
 LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <10> not available
 (Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1111.
 
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <11> not available
+(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1111.
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <11> not available
+(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1111.
+
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1111.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <12> not available
 (Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1111.
 
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <14> not available
+LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <17> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1111.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <14> not available
+LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <17> not available
 (Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1111.
 
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <20> not available
 (Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1111.
 LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <20> not available
-(Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1111.
-
-LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <22> not available
-(Font)              Font shape `OT1/ptm/b/n' tried instead on input line 1111.
-LaTeX Font Info:    Font shape `OT1/ptm/bx/it' in size <22> not available
 (Font)              Font shape `OT1/ptm/b/it' tried instead on input line 1111.
 
 LaTeX Font Info:    Font shape `OT1/ptm/bx/n' in size <24> not available
@@ -249,13 +249,12 @@ e
 Package caption Info: Begin \AtBeginDocument code.
 Package caption Info: float package is loaded.
 Package caption Info: End \AtBeginDocument code.
-LaTeX Font Info:    Calculating math sizes for size <14> on input line 10.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <14> on input line 10.
+(Font)              <12> on input line 22.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <9.79996> on input line 10.
+(Font)              <8> on input line 22.
 LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7> on input line 10.
+(Font)              <6> on input line 22.
 
 (./FinalReport.bbl)
 
@@ -275,18 +274,18 @@ Before submitting the final camera ready copy, remember to:
 ]
 (./FinalReport.aux) ) 
 Here is how much of TeX's memory you used:
- 3228 strings out of 492995
- 53256 string characters out of 6132704
- 119934 words of memory out of 5000000
- 6772 multiletter control sequences out of 15000+600000
- 32262 words of font info for 62 fonts, out of 8000000 for 9000
+ 3232 strings out of 492995
+ 53228 string characters out of 6132704
+ 120938 words of memory out of 5000000
+ 6770 multiletter control sequences out of 15000+600000
+ 33578 words of font info for 67 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,11n,40p,666b,305s stack positions out of 5000i,500n,10000p,200000b,80000s
+ 42i,14n,40p,666b,375s stack positions out of 5000i,500n,10000p,200000b,80000s
 {/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/base/8
 r.enc}</usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></us
 r/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/t
 exlive/2017/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on FinalReport.pdf (1 page, 40720 bytes).
+Output written on FinalReport.pdf (1 page, 41218 bytes).
 PDF statistics:
  21 PDF objects out of 1000 (max. 8388607)
  14 compressed objects within 1 object stream

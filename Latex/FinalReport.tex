@@ -1,4 +1,4 @@
-\documentclass[12pt,conference]{ieeeconf}
+\documentclass[11pt,conference]{ieeeconf}
 \bibliographystyle{ieeetr}
 \usepackage{graphicx}
 \usepackage{subcaption}
@@ -6,14 +6,27 @@
 \graphicspath{{/}}
 \begin{document}
 \title{Lensless Image Classification using Deep Learning}
-\author{Ganghun Kim\textsuperscript{1}, Brian Rodriguez\textsuperscript{1}, Rajesh Menon\textsuperscript{*}}
+\author{
+\begin{tabular}[t]{c c}
+Ganghun Kim & Brian Rodriguez\\
+\small Department of Electrical and Computer Engineering & \small Department of Electrical and Computer Engineering\\ 
+\small University of Utah & \small University of Utah
+\end{tabular}
+\\
+\begin{tabular}[t]{c}
+Rajesh Menon\\
+\small Department of Electrical and Computer Engineering\\
+\small University of Utah
+\end{tabular}
+}
 \maketitle
 
 \abstract
 Deep Learning (DL) has accelerated advancements in Image Classification via convolutional neural networks (CNNs). However, these image classification tasks have been widely trained on images taken with typical cameras; human consumable images. Here, we present a CNN trained using data taken by a single CMOS image sensor with no lens. We created a dataset of lensless images comprised of handwritten digits taken from the MNIST dataset. Then, we trained a CNN on this dataset and we're able to show that for 10 digits, the CNN is able to classify lensless images with 96.6\% accuracy.
 
 \section{Introduction}
-Wide-scale deep learning algorithms have pushed Image Classification to its limits. State-of-the-art architectures have been able to classify human consumable images with astonishing accuracy. 
+Wide-scale deep learning algorithms have pushed Image Classification to its limits. State-of-the-art architectures have been able to classify human consumable images with astonishing accuracy.
+Recently, lensless imaging has been gaining traction (ref). A lensless image is taken using a single CMOS image sensor without a lens. Previously, machine learning has been used to classify lensless images using support vector machines (SVMs) (ref). However, SVMs were only able to classify two digits accurately. This is an amazing achievement
 
 Recently, there have been advances in the space of lensless imaging, where a single CMOS image sensor is utilized to take an image without a lens.
 
@@ -23,7 +36,7 @@ Recently, there have been advances in the space of lensless imaging, where a sin
 We propose a novel CNN architecture that is able to classify lensless images at a 96.6\% accuracy. Our architecture is comprised of four sections containing convolutional layers and maxpooling layers, for downsampling. Following these four sections is a classifying section that contains two fully-connected layers, we also employed dropout with a probability of .5 to prevent overfitting in the network (ref). Each convolutional layer is followed by batch normalization and a ReLU activation function, except for the 1x1 convolutional layers which are used for dimensionality reduction after every pooling layer, excluding the final pooling layer.
 
 \section{Training Methodology}
-We created our network using Pytorch, a highly extensible deep learning framework. Our network was trained using stochastic gradient descent (SGD) with a momentum of .9 on a single NVidia Tesla V100 GPU (ref). While other gradient optimizers were tested such as Adam and Adagrad, they did not converge accordingly (ref). We used a learning rate of .001 decayed on 
+We created our network using Pytorch, a highly extensible deep learning framework. Our network was trained using stochastic gradient descent with a momentum of .9 on a single NVidia Tesla V100 GPU (ref). While other gradient optimizers were tested such as Adam and Adagrad, they did not converge accordingly (ref). We used a learning rate of .001, decayed when the loss plateaued; decaying three times over fifty epochs. The input data is gray-scaled, by default, was resized to 240x240 and randomly horizontally flipped.
 
 \section{Results}
 
