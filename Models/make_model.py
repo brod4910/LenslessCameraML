@@ -7,10 +7,18 @@ class Model(nn.Module):
 
     def __init__(self, feature_layers, classifier):
         super(Model, self).__init__()
+        self.first_layer = nn.Sequential(
+                nn.Conv2d(in_channels= 1, out_channels= 128, 
+                kernel_size= (3, 3), stride= 1, padding= 1),
+                nn.BatchNorm2d(128),
+                nn.ReLU(inplace=True)
+                )
         self.feature_layers = feature_layers
         self.classifier = classifier
 
+    # ['C', 1, 128, (3,3), 1, 1, 'ReLU']
     def forward(self, input):
+        input = self.first_layer(input)
         input = checkpoint_sequential(self.feature_layers, 4, input)
         input = input.view(input.size(0), -1)
         input = self.classifier(input)

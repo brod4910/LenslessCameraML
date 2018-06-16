@@ -23,7 +23,7 @@ Recently, there have been advances in the space of lensless imaging, where a sin
 We propose a novel CNN architecture that is able to classify lensless images at a 96.6\% accuracy. Our architecture is comprised of four sections containing convolutional layers and maxpooling layers, for downsampling. Following these four sections is a classifying section that contains two fully-connected layers, we also employed dropout with a probability of .5 to prevent overfitting in the network (ref). Each convolutional layer is followed by batch normalization and a ReLU activation function, except for the 1x1 convolutional layers which are used for dimensionality reduction after every pooling layer, excluding the final pooling layer.
 
 \section{Training Methodology}
-We created our network using Pytorch, a highly extensible deep learning framework. Our network was trained using stochastic gradient descent (SGD) with a momentum of .9 on a single NVidia Tesla V100 GPU (ref). While other gradient optimizers were tested such as Adam and Adagrad, they did not converge accordingly (ref). 
+We created our network using Pytorch, a highly extensible deep learning framework. Our network was trained using stochastic gradient descent (SGD) with a momentum of .9 on a single NVidia Tesla V100 GPU (ref). While other gradient optimizers were tested such as Adam and Adagrad, they did not converge accordingly (ref). We used a learning rate of .001 decayed on 
 
 \section{Results}
 
