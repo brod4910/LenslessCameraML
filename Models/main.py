@@ -3,6 +3,7 @@ import sys
 import argparse
 import torch
 import torch.nn as nn
+import torch.backends.cudnn as cudnn
 import make_model
 import models
 import wide_models
@@ -53,6 +54,9 @@ def main():
 
     use_cuda = torch.cuda.is_available()
     device = torch.device("cuda" if use_cuda else "cpu")
+
+    if use_cuda is True:
+        cudnn.benchmark = True
 
     if args.architecture == 'deep':
         network = make_model.Model(make_model.make_layers(models.feature_layers['2.5']), make_model.make_classifier_layers(models.classifier_layers['2.5']))

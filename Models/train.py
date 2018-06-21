@@ -85,6 +85,8 @@ def train(args, model, device, checkpoint):
     best_prec1 = 0 if checkpoint is None else checkpoint['best_prec1']
     is_best = False
 
+    del checkpoint
+
     # train and validate the model accordingly
     total_time = time.clock()
     for epoch in range(args.start_epoch, args.epochs + 1):
@@ -131,6 +133,7 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
+        del loss
 
 def test_epoch(model, test_loader, device):
     model.eval()

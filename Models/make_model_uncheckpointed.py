@@ -5,17 +5,14 @@ from torch.utils.checkpoint import checkpoint_sequential
 
 class Model(nn.Module):
 
-    def __init__(self, feature_layers, classifier, checkpoint= False):
+    def __init__(self, feature_layers, classifier):
         super(Model, self).__init__()
-        self.checkpoint = checkpoint
-        if checkpoint is True:
-            self.first_layer = nn.Sequential(
-                    nn.Conv2d(in_channels= 1, out_channels= 128, 
-                    kernel_size= (3, 3), stride= 1, padding= 1),
-                    nn.BatchNorm2d(128),
-                    nn.ReLU(inplace=True)
-                    )
-
+        self.first_layer = nn.Sequential(
+                nn.Conv2d(in_channels= 1, out_channels= 128, 
+                kernel_size= (3, 3), stride= 1, padding= 1),
+                nn.BatchNorm2d(128),
+                nn.ReLU(inplace=True)
+                )
         self.feature_layers = feature_layers
         self.classifier = classifier
 
@@ -27,9 +24,8 @@ class Model(nn.Module):
         input = self.classifier(input)
         return input
 
-def make_layers(layout, checkpoint= False):
+def make_layers(layout):
     layers = []
-    layout = del layout[0] if checkpoint is True else layout
     for layer in layout:
         if layer[0] == 'A':
             layers += [nn.AvgPool2d(kernel_size= (layer[1][0], layer[1][1]), stride= layer[2], padding= layer[3])]
