@@ -59,7 +59,7 @@ def main():
         cudnn.benchmark = True
 
     if args.architecture == 'deep':
-        network = make_model.Model(make_model.make_layers(models.feature_layers['2.5']), make_model.make_classifier_layers(models.classifier_layers['2.5']))
+        network = make_model.Model(make_model.make_layers(models.feature_layers['2.5']), make_model.make_classifier_layers(models.classifier_layers['2.5']), checkpoint= True)
     elif args.architecture == 'wide':
         network = make_wide_model.Wide_Model(make_wide_model.make_wide_layers(wide_models.feature_layers['1']), make_wide_model.make_classifier_layers(wide_models.classifier_layers['1.5']), device)
 
