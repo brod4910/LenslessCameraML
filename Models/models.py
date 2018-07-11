@@ -7,6 +7,7 @@
 # Alpha Dropout : ['AD', probability]
 # Classifying layer: ['FC', in_features, num_classes]
 # Possible Activation Fns: 'ReLU', 'PReLU', 'SELU', 'LeakyReLU', 'None'->(Contains no Batch Norm for dimensionality reduction 1x1 kernels)
+# srun python main.py --batch-size 16 --epochs 50 --lr 0.001 --momentum .9 --log-interval 100 --resize 240 --root-dir ../ --train-csv ../data_csv/0_9_train.csv --test-csv ../data_csv/0_9_test.csv
 
 feature_layers = {
 
@@ -30,6 +31,12 @@ feature_layers = {
     ['M', (2,2), 2, 0], ['C', 512, 128, (1,1), 1, 0, 'None'], ['C', 128, 128, (3,3), 1, 1, 'ReLU'], ['C', 128, 256, (3,3), 1, 1, 'ReLU'], ['C', 256, 512, (3,3), 1, 1, 'ReLU'], 
     ['M', (2,2), 2, 0], ['C', 512, 128, (1,1), 1, 0, 'None'], ['C', 128, 128, (3,3), 1, 1, 'ReLU'], ['C', 128, 256, (3,3), 1, 1, 'ReLU'], ['C', 256, 512, (3,3), 1, 1, 'ReLU'],
     ['M', (2,2), 2, 0], ['C', 512, 128, (1,1), 1, 0, 'None'], ['C', 128, 128, (3,3), 1, 1, 'ReLU'], ['C', 128, 256, (3,3), 1, 1, 'ReLU'], ['C', 256, 512, (3,3), 1, 1, 'ReLU'], 
+    ['M', (2,2), 2, 0]],
+
+    '2.5.5': [['C', 1, 128, (3,3), 1, 1, 'ReLU'], ['C', 128, 256, (3,3), 1, 1, 'ReLU'], ['C', 256, 256, (3,3), 1, 1, 'ReLU'], ['C', 256, 512, (3,3), 1, 1, 'ReLU'], 
+    ['M', (2,2), 2, 0], ['C', 512, 128, (1,1), 1, 0, 'ReLU'], ['C', 128, 128, (3,3), 1, 1, 'ReLU'], ['C', 128, 256, (3,3), 1, 1, 'ReLU'], ['C', 256, 512, (3,3), 1, 1, 'ReLU'], 
+    ['M', (2,2), 2, 0], ['C', 512, 128, (1,1), 1, 0, 'ReLU'], ['C', 128, 128, (3,3), 1, 1, 'ReLU'], ['C', 128, 256, (3,3), 1, 1, 'ReLU'], ['C', 256, 512, (3,3), 1, 1, 'ReLU'],
+    ['M', (2,2), 2, 0], ['C', 512, 128, (1,1), 1, 0, 'ReLU'], ['C', 128, 128, (3,3), 1, 1, 'ReLU'], ['C', 128, 256, (3,3), 1, 1, 'ReLU'], ['C', 256, 512, (3,3), 1, 1, 'ReLU'], 
     ['M', (2,2), 2, 0]],
 
     # 91% accuracy on digits 0-9

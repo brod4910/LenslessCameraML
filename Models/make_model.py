@@ -21,15 +21,20 @@ class Model(nn.Module):
 
     # ['C', 1, 128, (3,3), 1, 1, 'ReLU']
     def forward(self, input):
-        input = self.first_layer(input)
-        input = checkpoint_sequential(self.feature_layers, 4, input)
+        if checkpoint is True:
+            input = self.first_layer(input)
+            input = checkpoint_sequential(self.feature_layers, 4, input)
+        else:
+            input = self.feature_layers(input)
         input = input.view(input.size(0), -1)
         input = self.classifier(input)
         return input
 
 def make_layers(layout, checkpoint= False):
     layers = []
-    layout = del layout[0] if checkpoint is True else layout
+    if checkpoint is True:
+        del layout[0]
+
     for layer in layout:
         if layer[0] == 'A':
             layers += [nn.AvgPool2d(kernel_size= (layer[1][0], layer[1][1]), stride= layer[2], padding= layer[3])]
