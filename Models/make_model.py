@@ -8,23 +8,25 @@ class Model(nn.Module):
     def __init__(self, feature_layers, classifier, checkpoint= False):
         super(Model, self).__init__()
         self.checkpoint = checkpoint
-        if checkpoint is True:
-            self.first_layer = nn.Sequential(
-                    nn.Conv2d(in_channels= 1, out_channels= 128, 
-                    kernel_size= (3, 3), stride= 1, padding= 1),
-                    nn.BatchNorm2d(128),
-                    nn.ReLU(inplace=True)
-                    )
+        # if checkpoint is True:
+        #     self.first_layer = nn.Sequential(
+        #             nn.Conv2d(in_channels= 1, out_channels= 128, 
+        #             kernel_size= (3, 3), stride= 1, padding= 1),
+        #             nn.BatchNorm2d(128),
+        #             nn.ReLU(inplace=True)
+        #             )
 
         self.feature_layers = feature_layers
         self.classifier = classifier
 
     # ['C', 1, 128, (3,3), 1, 1, 'ReLU']
-    def forward(self, input):
+    def forward(self, x):
         if self.checkpoint is True:
-            modules = [module for k, module in self._modules.items()][0]
-            input = self.first_layer(input)
-            input = checkpoint_sequential(modules, 4, input)
+            # modules = [module for k, module in self._modules.items()][0]
+            input = x.detach()
+            input.requires_grad = True
+            # input = self.first_layer(input)
+            input = checkpoint_sequential(self.feature_layers, 2, input)
         else:
             input = self.feature_layers(input)
 
@@ -34,8 +36,8 @@ class Model(nn.Module):
 
 def make_layers(layout, checkpoint= False):
     layers = []
-    if checkpoint is True:
-        del layout[0]
+    # if checkpoint is True:
+    #     del layout[0]
 
     for layer in layout:
         if layer[0] == 'A':
