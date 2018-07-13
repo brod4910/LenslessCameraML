@@ -21,11 +21,13 @@ class Model(nn.Module):
 
     # ['C', 1, 128, (3,3), 1, 1, 'ReLU']
     def forward(self, input):
-        if checkpoint is True:
+        if self.checkpoint is True:
+            modules = [module for k, module in self._modules.items()][0]
             input = self.first_layer(input)
-            input = checkpoint_sequential(self.feature_layers, 4, input)
+            input = checkpoint_sequential(modules, 4, input)
         else:
             input = self.feature_layers(input)
+
         input = input.view(input.size(0), -1)
         input = self.classifier(input)
         return input

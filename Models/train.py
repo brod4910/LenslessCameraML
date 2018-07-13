@@ -12,17 +12,19 @@ import LenslessDataset
 
 def train(args, model, device, checkpoint):
 
-    if args.resize is not None:
+    if args.hflip is True:
         data_transform = transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
             transforms.RandomHorizontalFlip(),
             transforms.ToTensor()
             ])
-        print("\nImages resized to %d x %d" % (args.resize, args.resize))
     else:
         data_transform = transforms.Compose([
+            transforms.Resize((args.resize, args.resize)),
             transforms.ToTensor()
             ])
+
+    print("\nImages resized to %d x %d" % (args.resize, args.resize))
 
     # create both training and testing datasets
     train_dataset = LenslessDataset.LenslessDataset(

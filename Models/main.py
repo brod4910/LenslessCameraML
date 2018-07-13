@@ -23,7 +23,7 @@ def CreateArgsParser():
                     help='SGD momentum (default: 0.5)')
     parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                     help='how many batches to wait before logging training status')
-    parser.add_argument('--resize', type=int, default=None, 
+    parser.add_argument('--resize', required= True, type=int, default=None, 
                     help='dimensions of both height and width to be resized')
     parser.add_argument('--num-processes', type=int, default=2, metavar='N',
                     help='how many training processes to use (default: 2)')
@@ -45,6 +45,10 @@ def CreateArgsParser():
     parser.add_argument('--resume', default= None, 
                     help='file to load checkpoint from')
     parser.add_argument('--start-epoch', type=int, default=1)
+    parser.add_argument('--hflip', action='store_true',
+                    help='Randomly horizontally flip the images')
+    parser.add_argument('--vflip', action='store_true',
+                    help='Randomly vertically flip the images')
 
     return parser
 
@@ -59,8 +63,8 @@ def main():
         cudnn.benchmark = True
 
     if args.architecture == 'deep':
-        network = make_model.Model(make_model.make_layers(models.feature_layers['2.5.5']), 
-            make_model.make_classifier_layers(models.classifier_layers['2.5.5']), checkpoint= True)
+        network = make_model.Model(make_model.make_layers(models.feature_layers['2.5.5'], checkpoint= True), 
+            make_model.make_classifier_layers(models.classifier_layers['2.5']), checkpoint= True)
     elif args.architecture == 'wide':
         network = make_wide_model.Wide_Model(make_wide_model.make_wide_layers(wide_models.feature_layers['1']), 
             make_wide_model.make_classifier_layers(wide_models.classifier_layers['1.5']), device)
