@@ -26,6 +26,5 @@ class LenslessDataset(Dataset):
 		if self.transform is not None:
 			image = self.transform(image)
 
-		sample = {'image' : image, 'label': label}
 
-		return sample
+		return image, label
