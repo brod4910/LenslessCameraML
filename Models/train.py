@@ -12,10 +12,24 @@ import LenslessDataset
 
 def train(args, model, device, checkpoint):
 
-    if args.hflip is True:
+    # Data transformations
+    if args.hflip is True and args.vflip is False:
         data_transform = transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
             transforms.RandomHorizontalFlip(),
+            transforms.ToTensor()
+            ])
+    elif args.vflip is True and args.hflip is False:
+        data_transform = transforms.Compose([
+            transforms.Resize((args.resize, args.resize)),
+            transforms.RandomVerticalFlip(),
+            transforms.ToTensor()
+            ])
+    elif args.vflip is True and args.hflip is True:
+        data_transform = transforms.Compose([
+            transforms.Resize((args.resize, args.resize)),
+            transforms.RandomHorizontalFlip(),
+            transforms.RandomVerticalFlip(),
             transforms.ToTensor()
             ])
     else:
@@ -134,9 +148,8 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
         # report the train metrics depending on the log interval
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(data), len(train_loader.dataset),
+                epoch, batch_idx * len(input), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
-        del loss
 
 def test_epoch(model, test_loader, device):
     model.eval()

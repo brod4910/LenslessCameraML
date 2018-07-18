@@ -26,6 +26,6 @@ class LenslessDataset(Dataset):
         if self.transform is not None:
             image = self.transform(image)
 
-        image = image.astype('float')
+        image = image.type(torch.FloatTensor)
 
         return image, label

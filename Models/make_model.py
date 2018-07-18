@@ -8,24 +8,13 @@ class Model(nn.Module):
     def __init__(self, feature_layers, classifier, checkpoint= False):
         super(Model, self).__init__()
         self.checkpoint = checkpoint
-        # if checkpoint is True:
-        #     self.first_layer = nn.Sequential(
-        #             nn.Conv2d(in_channels= 1, out_channels= 128, 
-        #             kernel_size= (3, 3), stride= 1, padding= 1),
-        #             nn.BatchNorm2d(128),
-        #             nn.ReLU(inplace=True)
-        #             )
-
         self.feature_layers = feature_layers
         self.classifier = classifier
 
-    # ['C', 1, 128, (3,3), 1, 1, 'ReLU']
     def forward(self, x):
         if self.checkpoint is True:
-            # modules = [module for k, module in self._modules.items()][0]
             input = x.detach()
             input.requires_grad = True
-            # input = self.first_layer(input)
             input = checkpoint_sequential(self.feature_layers, 2, input)
         else:
             input = self.feature_layers(input)
@@ -36,8 +25,6 @@ class Model(nn.Module):
 
 def make_layers(layout, checkpoint= False):
     layers = []
-    # if checkpoint is True:
-    #     del layout[0]
 
     for layer in layout:
         if layer[0] == 'A':
@@ -48,13 +35,13 @@ def make_layers(layout, checkpoint= False):
             conv2d = nn.Conv2d(in_channels= layer[1], out_channels= layer[2], 
                 kernel_size= (layer[3][0], layer[3][1]), stride= layer[4], padding= layer[5])
             if layer[6] == 'ReLU':
-                layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.ReLU(inplace=True)]
+                layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.ReLU(inplace= False)]
             elif layer[6] == 'PReLU':
-                layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.PReLU(inplace=True)]
+                layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.PReLU(inplace= True)]
             elif layer[6] == 'SELU':
-                layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.SELU(inplace=True)]
+                layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.SELU(inplace= True)]
             elif layer[6] == 'LeakyReLU':
-                layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.LeakyReLU(inplace=True)]
+                layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.LeakyReLU(inplace= True)]
             else:
                 layers += [conv2d]
 
@@ -65,7 +52,7 @@ def make_classifier_layers(layout):
     for layer in layout:
         if layer[0] == 'L':
             if layer[3] == 'ReLU':
-                layers += [nn.Linear(layer[1], layer[2]), nn.BatchNorm1d(layer[2]), nn.ReLU(inplace= True)]
+                layers += [nn.Linear(layer[1], layer[2]), nn.BatchNorm1d(layer[2]), nn.ReLU(inplace= False)]
             elif layer[3] == 'PReLU':
                 layers += [nn.Linear(layer[1], layer[2]), nn.BatchNorm1d(layer[2]), nn.PReLU(inplace= True)]
             elif layer[3] == 'SELU':
