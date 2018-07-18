@@ -120,10 +120,10 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
     correct = 0
 
     # train the model over the training set
-    for batch_idx, (input, target) in enumerate(train_loader):
+    for batch_idx, data in enumerate(train_loader):
         
-        input = input.cuda(args.gpu, non_blocking=True)
-        target = target.cuda(args.gpu, non_blocking=True)
+        input_data = data['image'].cuda(0, non_blocking=True)
+        target = data['label'].cuda(0, non_blocking=True)
 
         output = model(input)
         loss = criterion(output, target)
@@ -147,10 +147,13 @@ def test_epoch(model, test_loader, device):
 
     # validate the model over the test set and record no gradient history
     with torch.no_grad():
-        for batch_idx, (input, target) in enumerate(test_loader):
-            input = input.cuda(args.gpu, non_blocking=True)
-            target = target.cuda(args.gpu, non_blocking=True)
+        for batch_idx, data in enumerate(test_loader):
             
+            input_data = data['image'].cuda(0, non_blocking=True)
+            target = data['label'].cuda(0, non_blocking=True)
+
+            # input_data, target = data['image'].type(torch.cuda.FloatTensor).to(device), data['label'].to(device)
+
             output = model(input_data)
             # sum up batch loss
             test_loss += F.cross_entropy(output, target, size_average=False).item()
