@@ -122,8 +122,7 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
     # train the model over the training set
     for batch_idx, (input, target) in enumerate(train_loader):
         
-        input = input.cuda(0, non_blocking=True)
-        target = target.cuda(0, non_blocking=True)
+        input, target = input.to(device), target.to(device)
 
         output = model(input)
         loss = criterion(output, target)
@@ -148,11 +147,8 @@ def test_epoch(model, test_loader, device):
     # validate the model over the test set and record no gradient history
     with torch.no_grad():
         for batch_idx, (input, target) in enumerate(test_loader):
-            
-            input = input.cuda(0, non_blocking=True)
-            target = target.cuda(0, non_blocking=True)
 
-            # input_data, target = data['image'].type(torch.cuda.FloatTensor).to(device), data['label'].to(device)
+            input, target = input.to(device), target.to(device)
 
             output = model(input)
             # sum up batch loss
