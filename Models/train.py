@@ -16,12 +16,14 @@ def train(args, model, device, checkpoint):
         data_transform = transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
             transforms.RandomHorizontalFlip(),
-            transforms.ToTensor()
+            transforms.ToTensor(),
+            transforms.Normalize(mean=1.0, std=1.0)
             ])
     else:
         data_transform = transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
-            transforms.ToTensor()
+            transforms.ToTensor(),
+            transforms.Normalize(mean=1.0, std=1.0)
             ])
 
     print("\nImages resized to %d x %d" % (args.resize, args.resize))
