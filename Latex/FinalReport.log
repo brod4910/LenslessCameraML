@@ -1,4 +1,4 @@
-This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  10 JUL 2018 13:29
+This is pdfTeX, Version 3.14159265-2.6-1.40.18 (TeX Live 2017) (preloaded format=pdflatex 2017.5.23)  21 JUL 2018 09:05
 entering extended mode
  restricted \write18 enabled.
  file:line:error style messages enabled.
@@ -173,7 +173,14 @@ Package: float 2001/11/08 v1.3d Float enhancements (AL)
 \@float@everytoks=\toks17
 \@floatcapt=\box28
 )
-(./FinalReport.aux)
+(./FinalReport.aux
+
+LaTeX Warning: Label `section2_3' multiply defined.
+
+
+LaTeX Warning: Label `section2_3' multiply defined.
+
+)
 \openout1 = `FinalReport.aux'.
 
 LaTeX Font Info:    Checking defaults for OML/cmm/m/it on input line 8.
@@ -188,8 +195,7 @@ LaTeX Font Info:    Checking defaults for OMX/cmex/m/n on input line 8.
 LaTeX Font Info:    ... okay on input line 8.
 LaTeX Font Info:    Checking defaults for U/cmr/m/n on input line 8.
 LaTeX Font Info:    ... okay on input line 8.
-
-(/usr/local/texlive/2017/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
+ (/usr/local/texlive/2017/texmf-dist/tex/context/base/mkii/supp-pdf.mkii
 [Loading MPS to PDF converter (version 2006.09.02).]
 \scratchcounter=\count96
 \scratchdimen=\dimen122
@@ -261,39 +267,44 @@ LaTeX Font Info:    External font `cmex10' loaded for size
 LaTeX Font Info:    External font `cmex10' loaded for size
 (Font)              <6> on input line 23.
 
-<section1.pdf, id=1, 108.89984pt x 355.57755pt>
-File: section1.pdf Graphic file (type pdf)
- <use section1.pdf>
-Package pdftex.def Info: section1.pdf used on input line 43.
-(pdftex.def)             Requested size: 50.59209pt x 165.18993pt.
+<imagingprocess.pdf, id=1, 699.6037pt x 200.47598pt>
+File: imagingprocess.pdf Graphic file (type pdf)
+ <use imagingprocess.pdf>
+Package pdftex.def Info: imagingprocess.pdf used on input line 33.
+(pdftex.def)             Requested size: 251.85713pt x 72.17128pt.
 
-<section2.pdf, id=2, 242.30122pt x 356.88162pt>
-File: section2.pdf Graphic file (type pdf)
- <use section2.pdf>
-Package pdftex.def Info: section2.pdf used on input line 44.
-(pdftex.def)             Requested size: 101.17645pt x 149.0234pt.
-LaTeX Font Info:    Calculating math sizes for size <11> on input line 47.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <11> on input line 47.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <7.69997> on input line 47.
-LaTeX Font Info:    External font `cmex10' loaded for size
-(Font)              <5.5> on input line 47.
-
-Overfull \hbox (260.17189pt too wide) in paragraph at lines 41--48
-[]$[]$ 
+Overfull \hbox (6.13902pt too wide) in paragraph at lines 33--34
+ [][] 
  []
 
-[1{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
+<section1.pdf, id=2, 109.8504pt x 356.35576pt>
+File: section1.pdf Graphic file (type pdf)
+ <use section1.pdf>
+Package pdftex.def Info: section1.pdf used on input line 48.
+(pdftex.def)             Requested size: 65.91074pt x 213.8151pt.
+
+<section2.pdf, id=3, 243.35216pt x 358.45819pt>
+File: section2.pdf Graphic file (type pdf)
+ <use section2.pdf>
+Package pdftex.def Info: section2.pdf used on input line 57.
+(pdftex.def)             Requested size: 146.0124pt x 215.07657pt.
+ [1{/usr/local/texlive/2017/texmf-var/fonts/map/pdftex/updmap/pdftex.map}
 
 
- <./section1.pdf> <./section2.pdf>] (./FinalReport.bbl
-Underfull \hbox (badness 10000) in paragraph at lines 66--68
+ <./imagingprocess.pdf> <./section1.pdf>] <section4.pdf, id=51, 245.718pt x 358
+.28343pt>
+File: section4.pdf Graphic file (type pdf)
+
+<use section4.pdf>
+Package pdftex.def Info: section4.pdf used on input line 63.
+(pdftex.def)             Requested size: 147.43193pt x 214.97171pt.
+ (./FinalReport.bbl [2 <./section2.pdf> <./section4.pdf>]
+Underfull \hbox (badness 10000) in paragraph at lines 70--72
 []\OT1/ptm/b/n/9 G. Klam-bauer, T. Un-terthiner, A. Mayr, and
  []
 
 
-Underfull \hbox (badness 7064) in paragraph at lines 66--68
+Underfull \hbox (badness 7064) in paragraph at lines 70--72
 \OT1/ptm/b/n/9 S. Hochre-iter, ``Self-normalizing neu-ral net-works,''
  []
 
@@ -309,23 +320,29 @@ Before submitting the final camera ready copy, remember to:
  uses only Type 1 fonts and that every step in the generation
  process uses the US letter (8.5in X 11in) paper size.
 
-[2] (./FinalReport.aux) ) 
+[3
+
+] (./FinalReport.aux)
+
+LaTeX Warning: There were multiply-defined labels.
+
+ ) 
 Here is how much of TeX's memory you used:
- 3378 strings out of 492995
- 55466 string characters out of 6132704
- 122798 words of memory out of 5000000
- 6907 multiletter control sequences out of 15000+600000
- 36697 words of font info for 72 fonts, out of 8000000 for 9000
+ 3369 strings out of 492995
+ 55317 string characters out of 6132704
+ 120840 words of memory out of 5000000
+ 6896 multiletter control sequences out of 15000+600000
+ 35781 words of font info for 69 fonts, out of 8000000 for 9000
  1141 hyphenation exceptions out of 8191
- 42i,14n,40p,1019b,405s stack positions out of 5000i,500n,10000p,200000b,80000s
-{/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/ba
-se/8r.enc}</usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmb8a.pfb>
-</usr/local/texlive/2017/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/loc
-al/texlive/2017/texmf-dist/fonts/type1/urw/times/utmr8a.pfb>
-Output written on FinalReport.pdf (2 pages, 71961 bytes).
+ 42i,14n,40p,1019b,375s stack positions out of 5000i,500n,10000p,200000b,80000s
+{/usr/local/texlive/2017/texmf-dist/fonts/enc/dvips/base/8r.enc}</usr/local/t
+exlive/2017/texmf-dist/fonts/type1/urw/times/utmb8a.pfb></usr/local/texlive/201
+7/texmf-dist/fonts/type1/urw/times/utmbi8a.pfb></usr/local/texlive/2017/texmf-d
+ist/fonts/type1/urw/times/utmr8a.pfb>
+Output written on FinalReport.pdf (3 pages, 1681110 bytes).
 PDF statistics:
- 48 PDF objects out of 1000 (max. 8388607)
- 32 compressed objects within 1 object stream
+ 92 PDF objects out of 1000 (max. 8388607)
+ 60 compressed objects within 1 object stream
  0 named destinations out of 1000 (max. 500000)
- 11 words of extra memory for PDF output out of 10000 (max. 10000000)
+ 21 words of extra memory for PDF output out of 10000 (max. 10000000)
 

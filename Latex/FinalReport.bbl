@@ -42,6 +42,10 @@ V.~Nair and G.~E. Hinton, ``Rectified linear units improve restricted boltzmann
   International Conference on Machine Learning}, ICML'10, (USA), pp.~807--814,
   Omnipress, 2010.
 
+\bibitem{DBLP:journals/corr/LinCY13}
+M.~Lin, Q.~Chen, and S.~Yan, ``Network in network,'' {\em CoRR},
+  vol.~abs/1312.4400, 2013.
+
 \bibitem{JMLR:v15:srivastava14a}
 N.~Srivastava, G.~Hinton, A.~Krizhevsky, I.~Sutskever, and R.~Salakhutdinov,
   ``Dropout: A simple way to prevent neural networks from overfitting,'' {\em
