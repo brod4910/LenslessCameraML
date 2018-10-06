@@ -86,9 +86,11 @@ def train(args, model, device, checkpoint):
 
     print("\nUsing optimizer: %s" % (args.optimizer))
 
-
-    # set the Loss function as CrossEntropy
-    criterion = torch.nn.CrossEntropyLoss().cuda() if device == "cuda" else torch.nn.CrossEntropyLoss()
+    if args.loss_fn == 'CELoss':
+        # set the Loss function as CrossEntropy
+        criterion = torch.nn.CrossEntropyLoss().cuda() if device == "cuda" else torch.nn.CrossEntropyLoss()
+    elif args.loss_fn == 'MMLoss':
+        criterion = torch.nn.MultiMarginLoss().cuda() if device == "cuda" else torch.nn.MultiMarginLoss()
 
     # either take the minimum loss then reduce LR or take max of accuracy then reduce LR
     if args.plateau == 'loss':
@@ -182,3 +184,12 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
     if is_best:
         shutil.copyfile(filename, 'model_best.pth.tar')
+
+def kFold(inputs, targets):
+        kfold = KFold(5, True, 11)
+        idxs = []
+
+        for train, test in enumerate(kfold.split(inputs, targets)):
+            idxs.append((train, test))
+
+        return idxs

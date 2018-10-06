@@ -19,7 +19,7 @@ def CreateArgsParser():
                     help='number of epochs to train (default: 10)')
     parser.add_argument('--lr', type=float, default=0.01, metavar='LR',
                     help='learning rate (default: 0.01)')
-    parser.add_argument('--momentum', type=float, default=0.5, metavar='M',
+    parser.add_argument('--momentum', type=float, default=0.9, metavar='M',
                     help='SGD momentum (default: 0.5)')
     parser.add_argument('--log-interval', type=int, default=10, metavar='N',
                     help='how many batches to wait before logging training status')
@@ -49,6 +49,10 @@ def CreateArgsParser():
                     help='Randomly horizontally flip the images')
     parser.add_argument('--vflip', action='store_true',
                     help='Randomly vertically flip the images')
+    parser.add_argument('--f-layers', required= True, default=None,
+                    help='Feature layers to be used during training. List of feature layers are in models.py.')
+    parser.add_argument('--c-layers', required= True, default=None,
+                    help='Classifying layers to be used during training. List of classifier layers are in models.py.')
 
     return parser
 
@@ -63,8 +67,8 @@ def main():
         cudnn.benchmark = True
 
     if args.architecture == 'deep':
-        network = make_model.Model(make_model.make_layers(models.feature_layers['2.5.5'], checkpoint= True), 
-            make_model.make_classifier_layers(models.classifier_layers['2.5']), checkpoint= True)
+        network = make_model.Model(make_model.make_layers(models.feature_layers[args.f_layers]), 
+            make_model.make_classifier_layers(models.classifier_layers[args.c_layers]), checkpoint= True)
     elif args.architecture == 'wide':
         network = make_wide_model.Wide_Model(make_wide_model.make_wide_layers(wide_models.feature_layers['1']), 
             make_wide_model.make_classifier_layers(wide_models.classifier_layers['1.5']), device)
