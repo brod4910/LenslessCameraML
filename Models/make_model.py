@@ -2,6 +2,26 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 
+class Model(nn.Module):
+
+    def __init__(self, feature_layers, classifier, checkpoint= False):
+        super(Model, self).__init__()
+        self.checkpoint = checkpoint
+        self.feature_layers = feature_layers
+        self.classifier = classifier
+
+    def forward(self, x):
+        if self.checkpoint is True:
+            input = x.detach()
+            input.requires_grad = True
+            input = checkpoint_sequential(self.feature_layers, 2, input)
+        else:
+            input = self.feature_layers(input)
+
+        input = input.view(input.size(0), -1)
+        input = self.classifier(input)
+        return input
+
 def make_layers(layout, upsample= False):
     layers = []
 
@@ -84,26 +104,6 @@ def make_classifier_layers(layout):
 # import torch.nn as nn
 # import torch.nn.functional as F
 # from torch.utils.checkpoint import checkpoint_sequential
-
-# class Model(nn.Module):
-
-#     def __init__(self, feature_layers, classifier, checkpoint= False):
-#         super(Model, self).__init__()
-#         self.checkpoint = checkpoint
-#         self.feature_layers = feature_layers
-#         self.classifier = classifier
-
-#     def forward(self, x):
-#         if self.checkpoint is True:
-#             input = x.detach()
-#             input.requires_grad = True
-#             input = checkpoint_sequential(self.feature_layers, 2, input)
-#         else:
-#             input = self.feature_layers(input)
-
-#         input = input.view(input.size(0), -1)
-#         input = self.classifier(input)
-#         return input
 
 # def make_layers(layout, checkpoint= False):
 #     layers = []
