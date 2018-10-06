@@ -49,6 +49,8 @@ def CreateArgsParser():
                     help='Randomly horizontally flip the images')
     parser.add_argument('--vflip', action='store_true',
                     help='Randomly vertically flip the images')
+    parser.add_argument('--loss-fn', default='CELoss',
+                    help='Loss funciton to be used: CELoss, MMLoss')
     parser.add_argument('--f-layers', required= True, default=None,
                     help='Feature layers to be used during training. List of feature layers are in models.py.')
     parser.add_argument('--c-layers', required= True, default=None,
