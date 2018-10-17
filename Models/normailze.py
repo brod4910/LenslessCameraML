@@ -26,7 +26,7 @@ def CreateArgsParser():
 def main():
     args = CreateArgsParser().parse_args()
 
-	MinMaxScale(args.root_dir, args.train_csv, args.test_csv, )
+	MinMaxScale(args.root_dir, args.train_csv, args.test_csv, args.path_to_save)
 
 
 def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
@@ -36,7 +36,7 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
 	offline_scaler = MinMaxScaler()
 	train_data = []
 	test_data = []
-	
+
 	csv_data = pd.read_csv(train_csv)
 
 	for row in csv_data.itertuples():
