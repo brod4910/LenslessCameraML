@@ -33,6 +33,9 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
     train_path = path_to_save + '/TRAIN'
     test_path = path_to_save + '/TEST'
 
+    if not os.path.exists(path_to_save):
+        os.makedirs(path_to_save)
+
     offline_scaler = MinMaxScaler()
     train_data = []
     test_data = []
