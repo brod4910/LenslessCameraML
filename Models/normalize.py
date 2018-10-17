@@ -33,12 +33,15 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
     train_path = path_to_save + '/TRAIN'
     test_path = path_to_save + '/TEST'
 
+    print("======> Creating folder to save to, if needed")
     if not os.path.exists(path_to_save):
         os.makedirs(path_to_save)
 
+    print("======> Creating train folder to save to, if needed")
     if not os.path.exists(train_path):
         os.makedirs(train_path)
 
+    print("======> Creating test folder to save to, if needed")
     if not os.path.exists(test_path):
         os.makedirs(test_path)
 
