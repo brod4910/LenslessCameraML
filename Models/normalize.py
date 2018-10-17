@@ -37,8 +37,10 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
     train_data = []
     test_data = []
 
+    print("======> reading train csv")
     csv_data = pd.read_csv(train_csv)
 
+    print("======> extracting images from csv")
     for row in csv_data.itertuples():
         img_name = os.path.join(root_dir, row[1])
         image = Image.open(img_name)
@@ -46,10 +48,13 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
         image = np.asarray(image)
         train_data.append([image, row[1], row[2]])
     
+    print("======> fitting training data")
     offline_scaler.fit(train_data[:,0]) # fit to training set
 
+    print("======> transforming training data")
     train_data[:,0] = offline_scaler.transform(train_data[:,0])
 
+    print("======> saving training data")
     for im in train_data:
         if not os.path.exists(train_path + str(im[2])):
             os.makedirs(train_path + str(im[2]))
@@ -58,8 +63,10 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
 
     del train_data
 
-    csv_data = pd.read_csv(train_csv)
+    print("======> readining test csv")
+    csv_data = pd.read_csv(test_csv)
 
+    print("======> extracting images from csv")
     for row in csv_data.itertuples():
         img_name = os.path.join(root_dir, row[1])
         image = Image.open(img_name)
@@ -67,8 +74,10 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
         image = np.asarray(image)
         test_data.append([image, row[1], row[2]])
 
+    print("======> transforming test data")
     test_data[:,0] = offline_scaler.transform(test_data[:,0])
 
+    print("======> saving test data")
     for im in train_data:
         if not os.path.exists(test_path + str(im[2])):
             os.makedirs(test_path + str(im[2]))
@@ -77,3 +86,5 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
 
 
 
+if __name__ == '__main__':
+    main()
