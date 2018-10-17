@@ -126,7 +126,10 @@ def train(args, model, device, checkpoint):
             'state_dict': model.state_dict(),
             'best_prec1': best_prec1,
             'optimizer' : optimizer.state_dict(),
-            'time': time.clock() - total_time
+            'time': time.clock() - total_time,
+            'c_layers' : args.c_layers,
+            'f_layers' : args.f_layers,
+            'batch_size' : args.batch_size
         }, is_best)
 
         is_best = False
@@ -153,6 +156,8 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
                 epoch, batch_idx * len(input), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
 
+        del input, target, loss, output
+
 def test_epoch(model, test_loader, device):
     model.eval()
     test_loss = 0
@@ -171,6 +176,8 @@ def test_epoch(model, test_loader, device):
             # get the index of the max log-probability
             pred = output.max(1, keepdim=True)[1]
             correct += pred.eq(target.view_as(pred)).sum().item()
+            
+            del input, target, output
 
     test_loss /= len(test_loader.dataset)
     accuracy = 100. * correct / len(test_loader.dataset)
