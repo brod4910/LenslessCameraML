@@ -90,7 +90,7 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
     test_data[:,0] = offline_scaler.transform(test_data[:,0])
 
     print("======> saving test data")
-    for im in train_data:
+    for im in test_data:
         if not os.path.exists(test_path + str(im[2])):
             os.makedirs(test_path + str(im[2]))
         im[0] = Image.fromarray(np.uint8(im[0]*255)) # multiply to 255 to save image so the image can be used by ToTensor() in pytorch
