@@ -60,6 +60,7 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
         image = np.asarray(image)
         train_data.append([image, row[1], row[2]])
     
+    train_data = np.array(train_data)
     print("======> fitting training data")
     offline_scaler.fit(train_data[:,0]) # fit to training set
 
@@ -86,6 +87,8 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
         image = np.asarray(image)
         test_data.append([image, row[1], row[2]])
 
+    test_data = np.array(test_data)
+    
     print("======> transforming test data")
     test_data[:,0] = offline_scaler.transform(test_data[:,0])
 
@@ -97,6 +100,13 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
         im[0].save(os.path.join(test_path, im[2], im[1]))
 
 
+# def save_array(path, data):
+#     print("======> saving training data")
+#     for im in data:
+#         if not os.path.exists(path + str(im[2])):
+#             os.makedirs(path + str(im[2]))
+#         im[0] = Image.fromarray(np.uint8(im[0]*255)) # multiply to 255 to save image so the image can be used by ToTensor() in pytorch
+#         im[0].save(os.path.join(path, im[2], im[1]))
 
 if __name__ == '__main__':
     main()
