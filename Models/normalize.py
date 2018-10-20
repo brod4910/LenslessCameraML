@@ -46,67 +46,57 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
         os.makedirs(test_path)
 
     offline_scaler = MinMaxScaler()
-    train_data = []
-    test_data = []
 
-    print("======> reading train csv")
-    csv_data = pd.read_csv(train_csv)
+    # extract train images from the csv
+    train_data, train_labels = extract_images(train_csv)
 
-    print("======> extracting images from csv")
-    for row in csv_data.itertuples():
-        img_name = os.path.join(root_dir, row[1])
-        image = Image.open(img_name)
-        image = image.resize((224,224))
-        image = np.asarray(image)
-        train_data.append([image, row[1], row[2]])
-    
-    train_data = np.array(train_data)
     print("======> fitting training data")
-    offline_scaler.fit(train_data[:,0]) # fit to training set
+    offline_scaler.fit(train_data) # fit to training set
 
     print("======> transforming training data")
-    train_data[:,0] = offline_scaler.transform(train_data[:,0])
+    train_data = offline_scaler.transform(train_data)
 
-    print("======> saving training data")
-    for im in train_data:
-        if not os.path.exists(train_path + str(im[2])):
-            os.makedirs(train_path + str(im[2]))
-        im[0] = Image.fromarray(np.uint8(im[0]*255)) # multiply to 255 to save image so the image can be used by ToTensor() in pytorch
-        im[0].save(os.path.join(train_path, im[2], im[1]))
+    # save images to disk
+    save_array(train_path, train_data, train_labels)
 
-    del train_data
+    del train_data, train_label
 
-    print("======> readining test csv")
-    csv_data = pd.read_csv(test_csv)
+    # extract test images from csv
+    test_data, test_labels = extract_images(test_csv)
 
+    print("======> transforming testing data")
+    test_data = offline_scaler.transform(test_data)
+
+    save_array(test_path, test_data, test_labels)
+
+def extract_images(csv_path):
     print("======> extracting images from csv")
+    csv_data = pd.read_csv(test_csv)
+    data = []
+    labels = []
     for row in csv_data.itertuples():
         img_name = os.path.join(root_dir, row[1])
         image = Image.open(img_name)
         image = image.resize((224,224))
         image = np.asarray(image)
-        test_data.append([image, row[1], row[2]])
+        data.append(image)
+        labels.append([row[1], row[2]])
 
-    test_data = np.array(test_data)
-    
-    print("======> transforming test data")
-    test_data[:,0] = offline_scaler.transform(test_data[:,0])
+    data = np.array(data, dtype= np.float)
+    nsamples, x, y = data.shape 
+    data = data.reshape(nsamples, x*y) # reshape the images to input into scaler function
 
-    print("======> saving test data")
-    for im in test_data:
-        if not os.path.exists(test_path + str(im[2])):
-            os.makedirs(test_path + str(im[2]))
-        im[0] = Image.fromarray(np.uint8(im[0]*255)) # multiply to 255 to save image so the image can be used by ToTensor() in pytorch
-        im[0].save(os.path.join(test_path, im[2], im[1]))
+    return data, labels
 
-
-# def save_array(path, data):
-#     print("======> saving training data")
-#     for im in data:
-#         if not os.path.exists(path + str(im[2])):
-#             os.makedirs(path + str(im[2]))
-#         im[0] = Image.fromarray(np.uint8(im[0]*255)) # multiply to 255 to save image so the image can be used by ToTensor() in pytorch
-#         im[0].save(os.path.join(path, im[2], im[1]))
+# function modifies original data parameter to save memory
+def save_array(path, data, label):
+    print("======> saving data")
+    data = data.reshape((nsamples, 224, 224))
+    for im, img_name, label in zip(data, label):
+        if not os.path.exists(path + str(label)):
+            os.makedirs(path + str(label))
+        im = Image.fromarray(np.uint8(im*255)) # multiply to 255 to save image so the image can be used by ToTensor() in pytorch
+        im.save(os.path.join(path, label, img_name))
 
 if __name__ == '__main__':
     main()
