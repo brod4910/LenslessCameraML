@@ -53,7 +53,7 @@ def Scale_data(root_dir, train_csv, test_csv, path_to_save, scaler):
         offline_scaler = StandardScaler()
 
     # extract train images from the csv
-    train_data, train_labels = extract_images(train_csv)
+    train_data, train_labels = extract_images(train_csv, root_dir)
 
     print("======> fitting training data")
     offline_scaler.fit(train_data) # fit to training set
@@ -67,14 +67,14 @@ def Scale_data(root_dir, train_csv, test_csv, path_to_save, scaler):
     del train_data, train_label
 
     # extract test images from csv
-    test_data, test_labels = extract_images(test_csv)
+    test_data, test_labels = extract_images(test_csv, root_dir)
 
     print("======> transforming testing data")
     test_data = offline_scaler.transform(test_data)
 
     save_array(test_path, test_data, test_labels)
 
-def extract_images(csv_path):
+def extract_images(csv_path, root_dir):
     print("======> extracting images from csv")
     csv_data = pd.read_csv(csv_path)
     data = []
