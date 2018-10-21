@@ -9,6 +9,7 @@ import time
 import sys
 import shutil
 import LenslessDataset
+from normalize import Scaler
 
 def train(args, model, device, checkpoint):
 
@@ -35,6 +36,7 @@ def train(args, model, device, checkpoint):
     else:
         data_transform = transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
+            Scaler(args.root_dir, args.train_csv, args.resize),
             transforms.ToTensor()            
             ])
 
