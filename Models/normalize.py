@@ -2,6 +2,7 @@ import os
 import sys
 import argparse
 from sklearn.preprocessing import MinMaxScaler
+from sklearn.preprocessing import StandardScaler
 import numpy as np
 from PIL import Image
 from sklearn import preprocessing
@@ -20,16 +21,17 @@ def CreateArgsParser():
                     help='path to the location of the train csv')
     parser.add_argument('--path-to-save', required= True, 
                     help='path to the location where the Normalized images will be saved')
+    parser.add_argument('--scaler', default= "minmax", 
+                    help='Scaler to normalize data. Options: Min Max Scaler (default), Standard Scaler (std)')
 
     return parser
 
 def main():
     args = CreateArgsParser().parse_args()
 
-    MinMaxScale(args.root_dir, args.train_csv, args.test_csv, args.path_to_save)
+    Scale_data(args.root_dir, args.train_csv, args.test_csv, args.path_to_save, args.scaler)
 
-
-def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
+def Scale_data(root_dir, train_csv, test_csv, path_to_save, scaler):
     train_path = path_to_save + '/TRAIN'
     test_path = path_to_save + '/TEST'
 
@@ -45,7 +47,10 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
     if not os.path.exists(test_path):
         os.makedirs(test_path)
 
-    offline_scaler = MinMaxScaler()
+    if scaler == "minmax":
+        offline_scaler = MinMaxScaler()
+    elif scaler == "std":
+        offline_scaler = StandardScaler()
 
     # extract train images from the csv
     train_data, train_labels = extract_images(train_csv)
@@ -71,7 +76,7 @@ def MinMaxScale(root_dir, train_csv, test_csv, path_to_save):
 
 def extract_images(csv_path):
     print("======> extracting images from csv")
-    csv_data = pd.read_csv(test_csv)
+    csv_data = pd.read_csv(csv_path)
     data = []
     labels = []
     for row in csv_data.itertuples():

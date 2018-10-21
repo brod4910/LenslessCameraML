@@ -60,16 +60,33 @@ def main():
 
 
 
-def shift_data(network, batch_size, device, test_csv, root_dir):
+class Shift(network, batch_size, device, test_csv, root_dir):
 	# look into translate
 
-def defocus_data(network, batch_size, device, test_csv, root_dir):
+# class Defocus(network, batch_size, device, test_csv, root_dir):
 
 
-def add_bias_noise(network, batch_size, device, test_csv, root_dir):
+class BiasNoise(object):
+	def __init__(self, bias_noise):
+		self.bias_noise = bias_noise
+
+	def __call__(self, img, label):
+		noisy_img = img + self.bias_noise
+		noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
+
+		return noisy_img_clipped, label
 
 
-def add_guassian_noise(network, batch_size, device, test_csv, root_dir):
+class GuassianNoise(object):
+	def __init__(self, mean, std):
+		self.mean = mean
+		self.std = std
+
+	def __call__(self, img, label):
+		noisy_img = img + np.random.normal(mean, std, img.shape)
+		noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
+
+		return noisy_img_clipped, label
 
 	
 
