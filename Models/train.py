@@ -131,7 +131,8 @@ def train(args, model, device, checkpoint):
             'time': time.clock() - total_time,
             'c_layers' : args.c_layers,
             'f_layers' : args.f_layers,
-            'batch_size' : args.batch_size
+            'batch_size' : args.batch_size,
+            'resize' : args.resize
         }, is_best)
 
         is_best = False
