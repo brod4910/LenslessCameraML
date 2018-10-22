@@ -57,6 +57,7 @@ def main():
                   .format(args.model))
         else:
             print("=> no checkpoint found at '{}'".format(args.model))
+            raise AssertionError("Failed to load Model")
 
         del checkpoint
 
@@ -66,7 +67,7 @@ def main():
 
     network = network.to(device)
 
-    print("\nBatch Size: %d" % (args.batch_size))
+    print("\nBatch Size: %d" % (batch_size))
 
     if args.shift is not None:
 	    data_transform = transforms.Compose([
@@ -99,9 +100,9 @@ def main():
 
     test_loader = torch.utils.data.DataLoader(
     test_dataset,
-    batch_size= args.batch_size,
+    batch_size= batch_size,
     shuffle= True,
-    num_workers = args.num_processes,
+    num_workers= 2,
     pin_memory= True
     )
 
