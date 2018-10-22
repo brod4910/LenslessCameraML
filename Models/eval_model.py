@@ -119,7 +119,7 @@ class Shift(object):
 
 	def __call__(self, img, label):
 		rows, cols = img.shape
-		shifted_img = cv2.wrapAffine(img, shift, (cols, rows))
+		shifted_img = cv2.wrapAffine(img, self.shift, (cols, rows))
 
 		return shifted_img, label
 	
