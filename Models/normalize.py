@@ -4,6 +4,7 @@ import sys
 import argparse
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import RobustScaler
 import numpy as np
 from PIL import Image
 import pandas as pd
@@ -18,6 +19,8 @@ class Scaler(object):
             self.online_scaler = MinMaxScaler()
         elif scaler == "std":
             self.online_scaler = StandardScaler()
+        elif: scaler == "robust":
+            self.online_scaler = RobustScaler()
 
         self.root_dir = root_dir
         self.train_csv = train_csv
