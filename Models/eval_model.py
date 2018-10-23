@@ -117,11 +117,11 @@ class Shift(object):
 	def __init__(self, shift):
 		self.shift = shift
 
-	def __call__(self, img, label):
+	def __call__(self, img):
 		rows, cols = img.shape
 		shifted_img = cv2.wrapAffine(img, self.shift, (cols, rows))
 
-		return shifted_img, label
+		return shifted_img
 	
 	# look into translate
 
@@ -135,11 +135,11 @@ class BiasNoise(object):
 	def __init__(self, bias_noise):
 		self.bias_noise = bias_noise
 
-	def __call__(self, img, label):
+	def __call__(self, img):
 		noisy_img = img + self.bias_noise
 		noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 
-		return noisy_img_clipped, label
+		return noisy_img_clipped
 
 '''
 Adds Guassian Noise to the image with mean and std.
@@ -150,11 +150,11 @@ class GuassianNoise(object):
 		self.mean = mean
 		self.std = std
 
-	def __call__(self, img, label):
+	def __call__(self, img):
 		noisy_img = img + np.random.normal(mean, std, img.shape)
 		noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 
-		return noisy_img_clipped, label
+		return noisy_img_clipped
 
 	
 
