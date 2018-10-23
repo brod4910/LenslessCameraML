@@ -16,11 +16,11 @@ class Model(nn.Module):
             modules = [module for k, module in self._modules.items()][0]
             input_var = x.detach()
             input_var.requires_grad = True
-            input_var = checkpoint_sequential(modules, 4, input_var)
+            input_var = checkpoint_sequential(modules, 6, input_var)
         else:
             input_var = self.feature_layers(input_var)
 
-        input_var = input.view(input_var.size(0), -1)
+        input_var = input_var.view(input_var.size(0), -1)
         input_var = self.classifier(input_var)
         return input_var
 

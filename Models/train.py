@@ -36,7 +36,7 @@ def train(args, model, device, checkpoint):
     else:
         data_transform = transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
-            Scaler(args.root_dir, args.train_csv, args.resize),
+            # Scaler(args.root_dir, args.train_csv, args.resize),
             transforms.ToTensor()            
             ])
 
@@ -137,21 +137,35 @@ def train(args, model, device, checkpoint):
 
         is_best = False
 
-def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
+def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, accumulation_steps= 16):
     model.train()
-    correct = 0
 
-    # train the model over the training set
-    for batch_idx, (input, target) in enumerate(train_loader):
+    model.zero_grad()                                   # Reset gradients tensors
+    for batch_idx, (inputs, labels) in enumerate(train_loader):
+
+        predictions = model(inputs)                     # Forward pass
+
+        loss = loss_function(predictions, labels)       # Compute loss function
+
+        loss = loss / accumulation_steps                # Normalize our loss (if averaged)
+
+        loss.backward()                                 # Backward pass
+
+        if (batch_idx+1) % accumulation_steps == 0:             # Wait for several backward steps
+            optimizer.step()                            # Now we can do an optimizer step
+            model.zero_grad()                           # Reset gradients tensors
+
+    # # train the model over the training set
+    # for batch_idx, (input, target) in enumerate(train_loader):
         
-        input, target = input.to(device), target.to(device)
+    #     input, target = input.to(device), target.to(device)
 
-        output = model(input)
-        loss = criterion(output, target)
+    #     output = model(input)
+    #     loss = criterion(output, target)
 
-        optimizer.zero_grad()
-        loss.backward()
-        optimizer.step()
+    #     optimizer.zero_grad()
+    #     loss.backward()
+    #     optimizer.step()
 
         # report the train metrics depending on the log interval
         if batch_idx % args.log_interval == 0:
