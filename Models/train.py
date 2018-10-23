@@ -141,11 +141,13 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
     model.train()
 
     model.zero_grad()                                   # Reset gradients tensors
-    for batch_idx, (inputs, labels) in enumerate(train_loader):
+    for batch_idx, (inputs, targets) in enumerate(train_loader):
+
+        inputs, targets = inputs.to(device), targets.to(device)
 
         predictions = model(inputs)                     # Forward pass
 
-        loss = loss_function(predictions, labels)       # Compute loss function
+        loss = loss_function(predictions, targets)       # Compute loss function
 
         loss = loss / accumulation_steps                # Normalize our loss (if averaged)
 
@@ -173,7 +175,7 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
                 epoch, batch_idx * len(input), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
 
-        del input, target, loss, output
+        del inputs, targets, loss, predictions
 
 def test_epoch(model, test_loader, device):
     model.eval()
