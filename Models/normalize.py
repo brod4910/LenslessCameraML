@@ -19,7 +19,7 @@ class Scaler(object):
             self.online_scaler = MinMaxScaler()
         elif scaler == "std":
             self.online_scaler = StandardScaler()
-        elif: scaler == "robust":
+        elif scaler == "robust":
             self.online_scaler = RobustScaler()
 
         self.root_dir = root_dir

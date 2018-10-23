@@ -129,6 +129,7 @@ class Shift(object):
 
 '''
 Adds bias noise to the input image.
+The bias is added when the object is called
 '''
 class BiasNoise(object):
 	def __init__(self, bias_noise):
@@ -142,6 +143,7 @@ class BiasNoise(object):
 
 '''
 Adds Guassian Noise to the image with mean and std.
+The bias is added when the object is called
 '''
 class GuassianNoise(object):
 	def __init__(self, mean, std):
