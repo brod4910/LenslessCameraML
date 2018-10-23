@@ -140,38 +140,48 @@ def train(args, model, device, checkpoint):
 def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, accumulation_steps= 16):
     model.train()
 
+    total_train_loss = 0
     total_loss = 0
 
     model.zero_grad()                                   # Reset gradients tensors
+
     for batch_idx, (inputs, targets) in enumerate(train_loader):
 
         inputs, targets = inputs.to(device), targets.to(device)
 
-        predictions = model(inputs)                     # Forward pass
+        output = model(inputs)  # forward pass
 
-        loss = criterion(predictions, targets)       # Compute loss function
+        loss = criterion(output, target) # compute loss
 
-        loss = loss / accumulation_steps                # Normalize our loss (if averaged)
+        total_train_loss += loss.item() # 
 
-        total_loss += loss.item()
+        total_loss = total_loss + loss
 
-        loss.backward()                                 # Backward pass
+        if batch_idx % accumulation_steps == 0:
 
-        if (batch_idx+1) % accumulation_steps == 0:             # Wait for several backward steps
-            optimizer.step()                            # Now we can do an optimizer step
-            model.zero_grad()                           # Reset gradients tensors
+            ave_loss = total_loss/accumulation_steps
+            optimizer.zero_grad()
+            ave_loss.backward()
+            optimizer.step()
+            total_loss = 0
 
-    # # train the model over the training set
-    # for batch_idx, (input, target) in enumerate(train_loader):
-        
-    #     input, target = input.to(device), target.to(device)
+    # for batch_idx, (inputs, targets) in enumerate(train_loader):
 
-    #     output = model(input)
-    #     loss = criterion(output, target)
+    #     inputs, targets = inputs.to(device), targets.to(device)
 
-    #     optimizer.zero_grad()
-    #     loss.backward()
-    #     optimizer.step()
+    #     predictions = model(inputs)                     # Forward pass
+
+    #     loss = criterion(predictions, targets)       # Compute loss function
+
+    #     loss = loss / accumulation_steps                # Normalize our loss (if averaged)
+
+    #     total_loss += loss.item()
+
+    #     loss.backward()                                 # Backward pass
+
+    #     if (batch_idx+1) % accumulation_steps == 0:     # Wait for several backward steps
+    #         optimizer.step()                            # Now we can do an optimizer step
+    #         model.zero_grad()                           # Reset gradients tensors
 
         # report the train metrics depending on the log interval
         if batch_idx % args.log_interval == 0:
@@ -181,8 +191,8 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
 
         del inputs, targets, loss, predictions
 
-    total_loss /= len(train_loader.dataset)
-    print('Averaged loss for training epoch: {:.4f}'.format(total_loss))
+    total_train_loss /= len(train_loader.dataset)
+    print('Averaged loss for training epoch: {:.4f}'.format(total_train_loss))
 
 def test_epoch(model, test_loader, device):
     model.eval()
