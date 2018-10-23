@@ -30,10 +30,10 @@ class Scaler(object):
     
     def __call__(self, image):
         img = np.asarray(image, dtype=np.float)
-        nsamples, x, y = img.shape
-        img = img.reshape(nsamples, x * y)
+        x, y = img.shape
+        img = img.reshape(1, x * y)
         img = self.online_scaler.transform(img)
-        img = img.reshape(x, y, nsamples)
+        img = img.reshape(x, y, 1)
         img = np.uint8(img*255)
         img = np.clip(img, 0, 255)
 

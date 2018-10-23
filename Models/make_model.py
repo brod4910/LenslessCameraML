@@ -15,7 +15,7 @@ class Model(nn.Module):
         if self.checkpoint is True:
             input = x.detach()
             input.requires_grad = True
-            input = checkpoint_sequential(self.feature_layers, 2, input)
+            input = checkpoint_sequential(self.feature_layers, 3, input)
         else:
             input = self.feature_layers(input)
 
