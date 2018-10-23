@@ -28,15 +28,16 @@ class Scaler(object):
         # fit training data
         self.fit_data(self.train_csv, self.root_dir, self.online_scaler)
     
-    def __call__(self, image, label):
-        x,y = image.shape
-        img = image.reshape(1, x*y)
+    def __call__(self, image):
+        img = np.asarray(image, dtype=np.float)
+        x,y = img.shape
+        img = img.reshape(1, x*y)
         img = self.online_scaler.transform(img)
         img = img.reshape(x,y)
         img = np.uint8(img*255)
         img = np.clip(img, 0, 255)
 
-        return img, label
+        return img
 
     def fit_data(self, csv_path, root_dir, online_scaler):
         print("======> fitting training data")
