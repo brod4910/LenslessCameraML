@@ -13,15 +13,16 @@ class Model(nn.Module):
 
     def forward(self, x):
         if self.checkpoint is True:
-            input = x.detach()
-            input.requires_grad = True
-            input = checkpoint_sequential(self.feature_layers, 3, input)
+            modules = [module for k, module in self._modules.items()][0]
+            input_var = x.detach()
+            input_var.requires_grad = True
+            input_var = checkpoint_sequential(modules, 4, input_var)
         else:
-            input = self.feature_layers(input)
+            input_var = self.feature_layers(input_var)
 
-        input = input.view(input.size(0), -1)
-        input = self.classifier(input)
-        return input
+        input_var = input.view(input_var.size(0), -1)
+        input_var = self.classifier(input_var)
+        return input_var
 
 def make_layers(layout, upsample= False):
     layers = []
