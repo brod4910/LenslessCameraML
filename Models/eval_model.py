@@ -72,21 +72,21 @@ def main():
     if args.shift is not None:
 	    data_transform = transforms.Compose([
 	    transforms.Resize((resize, resize)),
-	    Scaler(args.root_dir, args.train_csv, resize),
+	    # Scaler(args.root_dir, args.train_csv, resize),
 	    Shift([[1, 0, args.shift]. [0, 1, 0]]),
 	    transforms.ToTensor()          
 	    ])
 	elif args.guassian is not None:
 	    data_transform = transforms.Compose([
 	    transforms.Resize((resize, resize)),
-	    Scaler(args.root_dir, args.train_csv, resize),
+	    # Scaler(args.root_dir, args.train_csv, resize),
 	    GuassianNoise(args.gaussian),
 	    transforms.ToTensor()          
 	    ])
 	elif args.bias is not None:
 	    data_transform = transforms.Compose([
 	    transforms.Resize((resize, resize)),
-	    Scaler(args.root_dir, args.train_csv, resize),
+	    # Scaler(args.root_dir, args.train_csv, resize),
 	    Bias(args.bias),
 	    transforms.ToTensor()          
 	    ])
@@ -136,7 +136,7 @@ class BiasNoise(object):
 		self.bias_noise = bias_noise
 
 	def __call__(self, img):
-		noisy_img = img + self.bias_noise
+		noisy_img = np.array(img, dtype= np.float) + self.bias_noise
 		noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 
 		return noisy_img_clipped

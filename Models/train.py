@@ -36,7 +36,7 @@ def train(args, model, device, checkpoint):
     else:
         data_transform = transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
-            # Scaler(args.root_dir, args.train_csv, args.resize),
+            # Scaler(args.root_dir, args.train_csv, args.resize, scaler="minmax"),
             transforms.ToTensor()            
             ])
 
@@ -145,6 +145,8 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
 
     model.zero_grad()                                   # Reset gradients tensors
 
+    real_batch_size = accumulation_steps * args.batch_size
+
     for batch_idx, (inputs, targets) in enumerate(train_loader):
 
         inputs, targets = inputs.to(device), targets.to(device)
@@ -155,11 +157,11 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
 
         total_train_loss += loss.item() # 
 
-        total_loss = total_loss + loss
+        total_loss += loss
 
         if batch_idx % accumulation_steps == 0:
 
-            ave_loss = total_loss/accumulation_steps
+            ave_loss = total_loss/real_batch_size
             optimizer.zero_grad()
             ave_loss.backward()
             optimizer.step()
