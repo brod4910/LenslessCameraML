@@ -153,7 +153,7 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
 
         output = model(inputs)  # forward pass
 
-        loss = criterion(output, target) # compute loss
+        loss = criterion(output, targets) # compute loss
 
         total_train_loss += loss.item() # 
 
@@ -167,31 +167,13 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
             optimizer.step()
             total_loss = 0
 
-    # for batch_idx, (inputs, targets) in enumerate(train_loader):
-
-    #     inputs, targets = inputs.to(device), targets.to(device)
-
-    #     predictions = model(inputs)                     # Forward pass
-
-    #     loss = criterion(predictions, targets)       # Compute loss function
-
-    #     loss = loss / accumulation_steps                # Normalize our loss (if averaged)
-
-    #     total_loss += loss.item()
-
-    #     loss.backward()                                 # Backward pass
-
-    #     if (batch_idx+1) % accumulation_steps == 0:     # Wait for several backward steps
-    #         optimizer.step()                            # Now we can do an optimizer step
-    #         model.zero_grad()                           # Reset gradients tensors
-
         # report the train metrics depending on the log interval
         if batch_idx % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(inputs), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
 
-        del inputs, targets, loss, predictions
+        del inputs, targets, loss, output
 
     total_train_loss /= len(train_loader.dataset)
     print('Averaged loss for training epoch: {:.4f}'.format(total_train_loss))

@@ -73,7 +73,7 @@ def main():
 	    data_transform = transforms.Compose([
 	    transforms.Resize((resize, resize)),
 	    # Scaler(args.root_dir, args.train_csv, resize),
-	    Shift([[1, 0, args.shift]. [0, 1, 0]]),
+	    Shift(np.float32([[1, 0, args.shift], [0, 1, 0]])),
 	    transforms.ToTensor()          
 	    ])
 	elif args.guassian is not None:
@@ -118,8 +118,9 @@ class Shift(object):
 		self.shift = shift
 
 	def __call__(self, img):
-		rows, cols = img.shape
-		shifted_img = cv2.wrapAffine(img, self.shift, (cols, rows))
+		im = np.array(img, dtype= np.float)
+		rows, cols = im.shape
+		shifted_img = cv2.wrapAffine(im, self.shift, (cols, rows))
 
 		return shifted_img
 	
@@ -151,6 +152,7 @@ class GuassianNoise(object):
 		self.std = std
 
 	def __call__(self, img):
+		noisy_img = np.array(img, dtype= np.float)
 		noisy_img = img + np.random.normal(mean, std, img.shape)
 		noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 
