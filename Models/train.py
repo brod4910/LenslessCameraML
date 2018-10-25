@@ -176,7 +176,7 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
         del inputs, targets, loss, output
 
     total_train_loss /= len(train_loader.dataset)
-    print('Averaged loss for training epoch: {:.4f}'.format(total_train_loss))
+    print('\nAveraged loss for training epoch: {:.4f}'.format(total_train_loss))
 
 def test_epoch(model, test_loader, device):
     model.eval()
