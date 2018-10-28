@@ -137,7 +137,7 @@ def train(args, model, device, checkpoint):
 
         is_best = False
 
-def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, accumulation_steps= 16):
+def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, accumulation_steps= 8):
     model.train()
 
     total_train_loss = 0
