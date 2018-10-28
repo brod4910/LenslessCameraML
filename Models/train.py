@@ -157,7 +157,7 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
 
         total_loss += loss
 
-        if batch_idx % accumulation_steps == 0:
+        if (batch_idx + 1) % accumulation_steps == 0:
 
             ave_loss = total_loss/accumulation_steps
             optimizer.zero_grad()
