@@ -137,35 +137,29 @@ def train(args, model, device, checkpoint):
 
         is_best = False
 
-def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, accumulation_steps= 8):
+def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, accumulation_steps= 16):
     model.train()
 
     total_train_loss = 0
     total_loss = 0
 
     model.zero_grad()                                   # Reset gradients tensors
-
+    
     for batch_idx, (inputs, targets) in enumerate(train_loader):
 
         inputs, targets = inputs.to(device), targets.to(device)
 
-        output = model(inputs)  # forward pass
+        output = model(inputs)                     # Forward pass
 
-        loss = criterion(output, targets) # compute loss
+        loss = criterion(output, targets)       # Compute loss function
 
-        total_train_loss += loss.item() #
+        loss = loss / accumulation_steps                # Normalize our loss (if averaged)
 
-        total_loss += loss
+        loss.backward()   
 
-        if (batch_idx + 1) % accumulation_steps == 0:
-
-            ave_loss = total_loss/accumulation_steps
-            optimizer.zero_grad()
-            ave_loss.backward()
-            optimizer.step()
-            total_loss = 0
-
-            del ave_loss
+        if (i+1) % accumulation_steps == 0:             # Wait for several backward steps
+            optimizer.step()                            # Now we can do an optimizer step
+            model.zero_grad() 
 
         # report the train metrics depending on the log interval
         if batch_idx % args.log_interval == 0:
