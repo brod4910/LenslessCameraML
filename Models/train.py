@@ -152,23 +152,24 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
         output = model(inputs)                     # Forward pass
 
         loss = criterion(output, targets)      # Compute loss function
-
+        optimizer.zero_grad()
         loss.backward()
+        optimizer.step()
 
-        batch_loss += loss.item()
-        total_train_loss += loss.item()
+        # batch_loss += loss.item()
+        # total_train_loss += loss.item()
 
-        if (batch_idx + 1) % accumulation_steps == 0:             # Wait for several backward steps
-            optimizer.step()                            # Now we can do an optimizer step
-            optimizer.zero_grad()
+        # if (batch_idx + 1) % accumulation_steps == 0:             # Wait for several backward steps
+        #     optimizer.step()                            # Now we can do an optimizer step
+        #     optimizer.zero_grad()
 
-            if (batch_idx + 1) % args.log_interval == 0:
-                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                    epoch, batch_idx * len(inputs), len(train_loader.dataset),
-                    100. * batch_idx / len(train_loader), batch_loss))
-            # report the train metrics depending on the log interval
+        if (batch_idx + 1) % args.log_interval == 0:
+            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                epoch, batch_idx * len(inputs), len(train_loader.dataset),
+                100. * batch_idx / len(train_loader), loss.item()))
+        # report the train metrics depending on the log interval
 
-            batch_loss = 0 
+        #     batch_loss = 0 
 
         del inputs, targets, loss, output
 
