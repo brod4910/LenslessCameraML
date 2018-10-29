@@ -16,7 +16,7 @@ class Model(nn.Module):
             modules = [module for k, module in self._modules.items()][0]
             input_var = x.detach()
             input_var.requires_grad = True
-            input_var = checkpoint_sequential(modules, 2, input_var)
+            input_var = checkpoint_sequential(modules, 4, input_var)
         else:
             input_var = self.feature_layers(input_var)
 

@@ -151,11 +151,11 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
 
         output = model(inputs)                     # Forward pass
 
-        loss = criterion(output, targets) / accumulation_steps      # Compute loss function
+        loss = criterion(output, targets)      # Compute loss function
 
         loss.backward()
-        
-        batch_loss += (loss.item()/accumulation_steps)
+
+        batch_loss += loss.item()
         total_train_loss += loss.item()
 
         if (batch_idx + 1) % accumulation_steps == 0:             # Wait for several backward steps
