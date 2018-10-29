@@ -157,7 +157,7 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
         optimizer.step()
 
         # batch_loss += loss.item()
-        # total_train_loss += loss.item()
+        total_train_loss += loss.item()
 
         # if (batch_idx + 1) % accumulation_steps == 0:             # Wait for several backward steps
         #     optimizer.step()                            # Now we can do an optimizer step
