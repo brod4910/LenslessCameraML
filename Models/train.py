@@ -157,16 +157,18 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
         loss.backward()
         batch_loss += (loss.item()/accumulation_steps)
 
-        # report the train metrics depending on the log interval
-        if batch_idx % args.log_interval == 0:
-            print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(inputs), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), batch_loss))
 
 
         if (batch_idx + 1) % accumulation_steps == 0:             # Wait for several backward steps
             optimizer.step()                            # Now we can do an optimizer step
             optimizer.zero_grad()
+
+            # report the train metrics depending on the log interval
+            if batch_idx % args.log_interval == 0:
+                print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
+                    epoch, batch_idx * len(inputs), len(train_loader.dataset),
+                    100. * batch_idx / len(train_loader), batch_loss))
+    
             batch_loss = 0 
 
 
