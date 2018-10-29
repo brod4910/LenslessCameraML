@@ -141,7 +141,6 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
     model.train()
 
     total_train_loss = 0
-    total_loss = 0
     batch_loss = 0
 
     optimizer.zero_grad()                                   # Reset gradients tensors
@@ -155,22 +154,21 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
         loss = criterion(output, targets) / accumulation_steps      # Compute loss function
 
         loss.backward()
+        
         batch_loss += (loss.item()/accumulation_steps)
-
-
+        total_train_loss += loss.item()
 
         if (batch_idx + 1) % accumulation_steps == 0:             # Wait for several backward steps
             optimizer.step()                            # Now we can do an optimizer step
             optimizer.zero_grad()
 
-            # report the train metrics depending on the log interval
-            if batch_idx % args.log_interval == 0:
+            if (batch_idx + 1) % args.log_interval == 0:
                 print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                     epoch, batch_idx * len(inputs), len(train_loader.dataset),
                     100. * batch_idx / len(train_loader), batch_loss))
-    
-            batch_loss = 0 
+            # report the train metrics depending on the log interval
 
+            batch_loss = 0 
 
         del inputs, targets, loss, output
 
