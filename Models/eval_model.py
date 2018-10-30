@@ -49,6 +49,8 @@ def main():
             network = make_model.Model(make_model.make_layers(models.feature_layers[checkpoint['f_layers']]), 
                     make_model.make_classifier_layers(models.classifier_layers[checkpoint['c_layers']]), checkpoint= True)
 
+            network = network.to(device)
+
             network.load_state_dict(checkpoint['state_dict'])
             batch_size = checkpoint['batch_size']
             resize = checkpoint['resize']
@@ -66,8 +68,6 @@ def main():
     if torch.cuda.device_count() > 1:
         print("===> Number of GPU's available: %d" % torch.cuda.device_count())
         network = nn.DataParallel(network)
-
-    network = network.to(device)
 
     print("\nBatch Size: %d" % (batch_size))
 
@@ -141,7 +141,7 @@ class BiasNoise(object):
 
     def __call__(self, img):
         noisy_img = np.array(img, dtype= np.float) + self.bias_noise
-        row, cols = noisy_img.shape
+        rows, cols = noisy_img.shape
         noisy_img = noisy_img.reshape((cols, rows, 1))
         # noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 
@@ -158,7 +158,7 @@ class GuassianNoise(object):
 
     def __call__(self, img):
         noisy_img = np.array(img, dtype= np.float)
-        row, cols = noisy_img.shape
+        rows, cols = noisy_img.shape
         noisy_img = img + np.random.normal(mean, std, img.shape)
         noisy_img = noisy_img.reshape((cols, rows, 1))
         # noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise

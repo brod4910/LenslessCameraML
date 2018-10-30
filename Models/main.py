@@ -75,6 +75,8 @@ def main():
         network = make_wide_model.Wide_Model(make_wide_model.make_wide_layers(wide_models.feature_layers['1']), 
             make_wide_model.make_classifier_layers(wide_models.classifier_layers['1.5']), device)
 
+    network = network.to(device)
+    
     if args.resume is not None:
         if os.path.isfile(args.resume):
             print("=> loading checkpoint '{}'".format(args.resume))
@@ -92,7 +94,6 @@ def main():
         print("===> Number of GPU's available: %d" % torch.cuda.device_count())
         network = nn.DataParallel(network)
 
-    network = network.to(device)
 
     print("\nBatch Size: %d" % (args.batch_size))
 
