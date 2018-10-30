@@ -12,9 +12,9 @@ from normalize import Scaler
 from train import test_epoch
 
 def CreateArgsParser():
-	parser =  argparse.ArgumentParser(description='Evaluate Pretrained Model')
+    parser =  argparse.ArgumentParser(description='Evaluate Pretrained Model')
 
-	parser.add_argument('--model', default= None, required= True,
+    parser.add_argument('--model', default= None, required= True,
                     help='file to load checkpoint from')
     parser.add_argument('--root-dir', required= True,  
                     help='root directory where enclosing image files are located')
@@ -26,9 +26,9 @@ def CreateArgsParser():
                     help='Adds gaussian noise with std given by user')
     parser.add_argument('--shift', default= None, type= int, 
                     help='Shifts the image by the int given by user')
-	parser.add_argument('--bias', default= None, type= int,
+    parser.add_argument('--bias', default= None, type= int,
                     help='Adds bias noise to the image by the int given by user')
-	return parser
+    return parser
 
 def main():
     args = CreateArgsParser().parse_args()
@@ -44,8 +44,8 @@ def main():
             print("=> loading checkpoint '{}'".format(args.model))
             checkpoint = torch.load(args.model)
 
-		    network = make_model.Model(make_model.make_layers(models.feature_layers[checkpoint['f_layers']]), 
-		            make_model.make_classifier_layers(models.classifier_layers[checkpoint['c_layers']]), checkpoint= True)
+            network = make_model.Model(make_model.make_layers(models.feature_layers[checkpoint['f_layers']]), 
+                    make_model.make_classifier_layers(models.classifier_layers[checkpoint['c_layers']]), checkpoint= True)
 
             network.load_state_dict(checkpoint['state_dict'])
             batch_size = checkpoint['batch_size']
@@ -70,26 +70,26 @@ def main():
     print("\nBatch Size: %d" % (batch_size))
 
     if args.shift is not None:
-	    data_transform = transforms.Compose([
-	    transforms.Resize((resize, resize)),
-	    # Scaler(args.root_dir, args.train_csv, resize),
-	    Shift(np.float32([[1, 0, args.shift], [0, 1, 0]])),
-	    transforms.ToTensor()          
-	    ])
-	elif args.guassian is not None:
-	    data_transform = transforms.Compose([
-	    transforms.Resize((resize, resize)),
-	    # Scaler(args.root_dir, args.train_csv, resize),
-	    GuassianNoise(args.gaussian),
-	    transforms.ToTensor()          
-	    ])
-	elif args.bias is not None:
-	    data_transform = transforms.Compose([
-	    transforms.Resize((resize, resize)),
-	    # Scaler(args.root_dir, args.train_csv, resize),
-	    Bias(args.bias),
-	    transforms.ToTensor()          
-	    ])
+        data_transform = transforms.Compose([
+        transforms.Resize((resize, resize)),
+        # Scaler(args.root_dir, args.train_csv, resize),
+        Shift(np.float32([[1, 0, args.shift], [0, 1, 0]])),
+        transforms.ToTensor()          
+        ])
+    elif args.guassian is not None:
+        data_transform = transforms.Compose([
+        transforms.Resize((resize, resize)),
+        # Scaler(args.root_dir, args.train_csv, resize),
+        GuassianNoise(args.gaussian),
+        transforms.ToTensor()          
+        ])
+    elif args.bias is not None:
+        data_transform = transforms.Compose([
+        transforms.Resize((resize, resize)),
+        # Scaler(args.root_dir, args.train_csv, resize),
+        Bias(args.bias),
+        transforms.ToTensor()          
+        ])
 
     # load the test dataset
     test_dataset = LenslessDataset.LenslessDataset(
@@ -114,17 +114,17 @@ The shifting matrix has dimensions 2x3 Ex: [[1, 0, s], [0, 1, t]], where s and t
 and the array is an np.float32
 '''
 class Shift(object):
-	def __init__(self, shift):
-		self.shift = shift
+    def __init__(self, shift):
+        self.shift = shift
 
-	def __call__(self, img):
-		im = np.array(img, dtype= np.float)
-		rows, cols = im.shape
-		shifted_img = cv2.wrapAffine(im, self.shift, (cols, rows))
+    def __call__(self, img):
+        im = np.array(img, dtype= np.float)
+        rows, cols = im.shape
+        shifted_img = cv2.wrapAffine(im, self.shift, (cols, rows))
 
-		return shifted_img
-	
-	# look into translate
+        return shifted_img
+    
+    # look into translate
 
 # class Defocus(network, batch_size, device, test_csv, root_dir):
 
@@ -133,31 +133,31 @@ Adds bias noise to the input image.
 The bias is added when the object is called
 '''
 class BiasNoise(object):
-	def __init__(self, bias_noise):
-		self.bias_noise = bias_noise
+    def __init__(self, bias_noise):
+        self.bias_noise = bias_noise
 
-	def __call__(self, img):
-		noisy_img = np.array(img, dtype= np.float) + self.bias_noise
-		noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
+    def __call__(self, img):
+        noisy_img = np.array(img, dtype= np.float) + self.bias_noise
+        noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 
-		return noisy_img_clipped
+        return noisy_img_clipped
 
 '''
 Adds Guassian Noise to the image with mean and std.
 The bias is added when the object is called
 '''
 class GuassianNoise(object):
-	def __init__(self, mean, std):
-		self.mean = mean
-		self.std = std
+    def __init__(self, mean, std):
+        self.mean = mean
+        self.std = std
 
-	def __call__(self, img):
-		noisy_img = np.array(img, dtype= np.float)
-		noisy_img = img + np.random.normal(mean, std, img.shape)
-		noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
+    def __call__(self, img):
+        noisy_img = np.array(img, dtype= np.float)
+        noisy_img = img + np.random.normal(mean, std, img.shape)
+        noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 
-		return noisy_img_clipped
+        return noisy_img_clipped
 
-	
+    
 if __name__ == '__main__':
     main()
