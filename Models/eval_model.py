@@ -159,4 +159,5 @@ class GuassianNoise(object):
 		return noisy_img_clipped
 
 	
-
+if __name__ == '__main__':
+    main()
