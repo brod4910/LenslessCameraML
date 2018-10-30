@@ -10,7 +10,6 @@ import cv2
 import LenslessDataset
 from normalize import CastTensor
 from torchvision import datasets, transforms
-from train import test_epoch
 import numpy as np
 
 def CreateArgsParser():
@@ -49,21 +48,17 @@ def main():
             network = make_model.Model(make_model.make_layers(models.feature_layers[checkpoint['f_layers']]), 
                     make_model.make_classifier_layers(models.classifier_layers[checkpoint['c_layers']]), checkpoint= True)
 
+            network.load_state_dict(checkpoint['state_dict'])
+            network.eval()
             network = network.to(device)
 
-            network.load_state_dict(checkpoint['state_dict'])
             batch_size = checkpoint['batch_size']
             resize = checkpoint['resize']
-            # args.start_epoch = checkpoint['epoch'] + 1
-            # best_prec1 = checkpoint['best_prec1']
-            # optimizer.load_state_dict(checkpoint['optimizer'])
             print("=> loaded model '{}'"
                   .format(args.model))
         else:
             print("=> no checkpoint found at '{}'".format(args.model))
             raise AssertionError("Failed to load Model")
-
-        del checkpoint
 
     if torch.cuda.device_count() > 1:
         print("===> Number of GPU's available: %d" % torch.cuda.device_count())
@@ -111,7 +106,33 @@ def main():
     pin_memory= True
     )
 
-    test_lost, accuracy = test_epoch(network, test_loader, device)
+    test_epoch(network, test_loader, device)
+
+def test_epoch(model, test_loader, device):
+    test_loss = 0
+    accuracy = 0
+    correct = 0
+
+    # validate the model over the test set and record no gradient history
+    with torch.no_grad():
+        for batch_idx, (input, target) in enumerate(test_loader):
+
+            input, target = input.to(device), target.to(device)
+
+            output = model(input)
+            # sum up batch loss
+            test_loss += F.cross_entropy(output, target, size_average=False).item()
+            # get the index of the max log-probability
+            pred = output.max(1, keepdim=True)[1]
+            correct += pred.eq(target.view_as(pred)).sum().item()
+            
+            del input, target, output
+
+    test_loss /= len(test_loader.dataset)
+    accuracy = 100. * correct / len(test_loader.dataset)
+    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.1f}%)\n'
+          .format(test_loss, correct, len(test_loader.dataset),
+                  100. * correct / len(test_loader.dataset)))
 
 '''
 Shifts the image by shift. Shift here IS the shifting array.
