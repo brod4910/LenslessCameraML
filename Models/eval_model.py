@@ -14,7 +14,7 @@ from train import test_epoch
 def CreateArgsParser():
 	parser =  argparse.ArgumentParser(description='Evaluate Pretrained Model')
 
-	parser.add_argument('--model', default= None, required= True 
+	parser.add_argument('--model', default= None, required= True,
                     help='file to load checkpoint from')
     parser.add_argument('--root-dir', required= True,  
                     help='root directory where enclosing image files are located')
