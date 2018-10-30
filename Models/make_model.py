@@ -2,6 +2,7 @@ import torch
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.utils.checkpoint import checkpoint_sequential
+from torch.utils.checkpoint import checkpoint
 
 class Model(nn.Module):
 
@@ -10,18 +11,30 @@ class Model(nn.Module):
         self.checkpoint = checkpoint
         self.feature_layers = feature_layers
         self.classifier = classifier
+        self.dummy_tensor = torch.ones(1, dtype=torch.float32, requires_grad=True)
+        self.module_wrapper = ModuleWrapperIgnores2ndArg(self.feature_layers)
 
-    def forward(self, x):
+    def forward(self, input_var):
         if self.checkpoint is True:
-            input_var = x.detach()
-            input_var.requires_grad = True
-            input_var = checkpoint_sequential(self.feature_layers, 4, input_var)
+            # x = checkpoint(self.module_wrapper,x,self.dummy_tensor)
+            input_var = checkpoint(self.module_wrapper, input_var, self.dummy_tensor)
         else:
             input_var = self.feature_layers(input_var)
 
         input_var = input_var.view(input_var.size(0), -1)
         input_var = self.classifier(input_var)
         return input_var
+
+
+class ModuleWrapperIgnores2ndArg(nn.Module):
+    def __init__(self, module):
+        super().__init__()
+        self.module = module
+
+    def forward(self,x, dummy_arg=None):
+        assert dummy_arg is not None
+        x = self.module(x)
+        return x
 
 def make_layers(layout, upsample= False):
     layers = []
