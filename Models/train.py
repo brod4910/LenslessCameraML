@@ -9,7 +9,7 @@ import time
 import sys
 import shutil
 import LenslessDataset
-from normalize import Scaler
+from normalize import CastTensor
 
 def train(args, model, device, checkpoint):
 
@@ -36,8 +36,9 @@ def train(args, model, device, checkpoint):
     else:
         data_transform = transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
-            # Scaler(args.root_dir, args.train_csv, args.resize, scaler="minmax"),
-            transforms.ToTensor()            
+            transforms.ToTensor(),
+            CastTensor('torch.FloatTensor')
+            transforms.Normalize([40414.038877341736], [35951.78672059086])
             ])
 
     print("\nImages resized to %d x %d" % (args.resize, args.resize))

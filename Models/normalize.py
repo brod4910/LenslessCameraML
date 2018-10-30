@@ -8,6 +8,10 @@ from sklearn.preprocessing import RobustScaler
 import numpy as np
 from PIL import Image
 import pandas as pd
+
+def main():
+
+
 '''
 Fits the training to a Scaler. Scaler can be Standard or MinMax.
 When used as a Pytorch Transform, the call funciton transforms the image
@@ -60,3 +64,12 @@ class Scaler(object):
                 os.makedirs(path + str(label))
             im = Image.fromarray(np.uint8(im*255)) # multiply to 255 to save image so the image can be used by ToTensor() in pytorch
             im.save(os.path.join(path, label, img_name))
+
+class CastTensor(object):
+    def __init__(self, dtype):
+        self.type = dtype
+
+    def __call__(self, image):
+        img = image.type(self.type)
+
+        return img
