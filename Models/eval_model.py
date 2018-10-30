@@ -9,7 +9,9 @@ import models
 import cv2
 import LenslessDataset
 from normalize import CastTensor
+from torchvision import datasets, transforms
 from train import test_epoch
+import numpy as np
 
 def CreateArgsParser():
     parser =  argparse.ArgumentParser(description='Evaluate Pretrained Model')
@@ -88,7 +90,7 @@ def main():
     elif args.bias is not None:
         data_transform = transforms.Compose([
         transforms.Resize((resize, resize)),
-        Bias(args.bias),
+        BiasNoise(args.bias),
         transforms.ToTensor(),
         CastTensor('torch.FloatTensor'),
         transforms.Normalize([40414.038877341736], [35951.78672059086])
@@ -139,9 +141,11 @@ class BiasNoise(object):
 
     def __call__(self, img):
         noisy_img = np.array(img, dtype= np.float) + self.bias_noise
-        noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
+        row, cols = noisy_img.shape
+        noisy_img = noisy_img.reshape((cols, rows, 1))
+        # noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 
-        return noisy_img_clipped
+        return noisy_img
 
 '''
 Adds Guassian Noise to the image with mean and std.
@@ -154,10 +158,12 @@ class GuassianNoise(object):
 
     def __call__(self, img):
         noisy_img = np.array(img, dtype= np.float)
+        row, cols = noisy_img.shape
         noisy_img = img + np.random.normal(mean, std, img.shape)
-        noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
+        noisy_img = noisy_img.reshape((cols, rows, 1))
+        # noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 
-        return noisy_img_clipped
+        return noisy_img
 
     
 if __name__ == '__main__':

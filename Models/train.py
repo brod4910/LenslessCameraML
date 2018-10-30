@@ -37,7 +37,7 @@ def train(args, model, device, checkpoint):
         data_transform = transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
             transforms.ToTensor(),
-            CastTensor('torch.FloatTensor')
+            CastTensor('torch.FloatTensor'),
             transforms.Normalize([40414.038877341736], [35951.78672059086])
             ])
 
