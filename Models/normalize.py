@@ -9,9 +9,6 @@ import numpy as np
 from PIL import Image
 import pandas as pd
 
-def main():
-
-
 '''
 Fits the training to a Scaler. Scaler can be Standard or MinMax.
 When used as a Pytorch Transform, the call funciton transforms the image

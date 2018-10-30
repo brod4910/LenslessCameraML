@@ -8,7 +8,7 @@ import make_model
 import models
 import cv2
 import LenslessDataset
-from normalize import Scaler
+from normalize import CastTensor
 from train import test_epoch
 
 def CreateArgsParser():
@@ -74,7 +74,7 @@ def main():
         transforms.Resize((resize, resize)),
         Shift(np.float32([[1, 0, args.shift], [0, 1, 0]])),
         transforms.ToTensor(),
-        CastTensor('torch.FloatTensor')
+        CastTensor('torch.FloatTensor'),
         transforms.Normalize([40414.038877341736], [35951.78672059086])
         ])
     elif args.guassian is not None:
@@ -82,7 +82,7 @@ def main():
         transforms.Resize((resize, resize)),
         GuassianNoise(args.gaussian),
         transforms.ToTensor(),
-        CastTensor('torch.FloatTensor')
+        CastTensor('torch.FloatTensor'),
         transforms.Normalize([40414.038877341736], [35951.78672059086])
         ])
     elif args.bias is not None:
@@ -90,7 +90,7 @@ def main():
         transforms.Resize((resize, resize)),
         Bias(args.bias),
         transforms.ToTensor(),
-        CastTensor('torch.FloatTensor')
+        CastTensor('torch.FloatTensor'),
         transforms.Normalize([40414.038877341736], [35951.78672059086])
         ])
 
@@ -126,8 +126,6 @@ class Shift(object):
         shifted_img = cv2.wrapAffine(im, self.shift, (cols, rows))
 
         return shifted_img
-    
-    # look into translate
 
 # class Defocus(network, batch_size, device, test_csv, root_dir):
 
