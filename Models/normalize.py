@@ -65,6 +65,47 @@ class Scaler(object):
             im = Image.fromarray(np.uint8(im*255)) # multiply to 255 to save image so the image can be used by ToTensor() in pytorch
             im.save(os.path.join(path, label, img_name))
 
+class RunningStats:
+
+    def __init__(self, resize= (240,240)):
+        self.n = 0
+        self.old_m = 0
+        self.new_m = 0
+        self.old_s = 0
+        self.new_s = 0
+        self.resize = resize
+
+    def clear(self):
+        self.n = 0
+
+    def push(self, x):
+        self.n += 1
+        
+        image = Image.open(x)
+        image = image.resize(self.resize)
+        image = np.asarray(image)
+        image = image.reshape(1, self.resize[0] * self.resize[1])
+#         print(image)
+
+        if self.n == 1:
+            self.old_m = self.new_m = np.mean(image)
+            self.old_s = 0
+        else:
+            self.new_m = self.old_m + (np.mean(image) - self.old_m) / self.n
+            self.new_s = self.old_s + (np.std(image) - self.old_m) * (np.std(image) - self.new_m)
+
+            self.old_m = self.new_m
+            self.old_s = self.new_s
+
+    def mean(self):
+        return self.new_m if self.n else 0.0
+
+    def variance(self):
+        return self.new_s / (self.n - 1) if self.n > 1 else 0.0
+
+    def standard_deviation(self):
+        return np.sqrt(self.variance())
+
 class CastTensor(object):
     def __init__(self, dtype):
         self.type = dtype

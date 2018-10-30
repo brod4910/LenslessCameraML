@@ -72,23 +72,26 @@ def main():
     if args.shift is not None:
         data_transform = transforms.Compose([
         transforms.Resize((resize, resize)),
-        # Scaler(args.root_dir, args.train_csv, resize),
         Shift(np.float32([[1, 0, args.shift], [0, 1, 0]])),
-        transforms.ToTensor()          
+        transforms.ToTensor(),
+        CastTensor('torch.FloatTensor')
+        transforms.Normalize([40414.038877341736], [35951.78672059086])
         ])
     elif args.guassian is not None:
         data_transform = transforms.Compose([
         transforms.Resize((resize, resize)),
-        # Scaler(args.root_dir, args.train_csv, resize),
         GuassianNoise(args.gaussian),
-        transforms.ToTensor()          
+        transforms.ToTensor(),
+        CastTensor('torch.FloatTensor')
+        transforms.Normalize([40414.038877341736], [35951.78672059086])
         ])
     elif args.bias is not None:
         data_transform = transforms.Compose([
         transforms.Resize((resize, resize)),
-        # Scaler(args.root_dir, args.train_csv, resize),
         Bias(args.bias),
-        transforms.ToTensor()          
+        transforms.ToTensor(),
+        CastTensor('torch.FloatTensor')
+        transforms.Normalize([40414.038877341736], [35951.78672059086])
         ])
 
     # load the test dataset
