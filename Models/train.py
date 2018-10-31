@@ -10,7 +10,7 @@ import sys
 import shutil
 import LenslessDataset
 from normalize import CastTensor
-from eval_model import BiasNoise, Shift, GaussianNoise
+# from eval_model import BiasNoise, Shift, GaussianNoise
 
 def train(args, model, device, checkpoint):
 
@@ -139,42 +139,40 @@ def train(args, model, device, checkpoint):
 
         is_best = False
 
+# def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None):
+#     transforms = []
 
-def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None):
-    transforms = []
+#     if Bias is not None:
+#         transforms += [BiasNoise(Bias)]
+#     if Shift is not None:
+#         transforms += [Shift(np.float32([[1, 0, Shift], [0, 1, 0]]))]
+#     if Gaussian is not None:
+#         transforms += [GaussianNoise(Gaussian)]
 
-    if Bias is not None:
-        transforms += [BiasNoise(Bias)]
-    if Shift is not None:
-        transforms += [Shift(np.float32([[1, 0, Shift], [0, 1, 0]]))]
-    if Gaussian is not None:
-        transforms += [GaussianNoise(Gaussian)]
+#     for transform in transforms:
+#         data_transform = transforms.Compose([
+#             transforms.Resize((args.resize, args.resize)),
+#             transform,
+#             transforms.ToTensor(),
+#             CastTensor('torch.FloatTensor'),
+#             transforms.Normalize([40414.038877341736], [35951.78672059086])
+#             ])
 
-    for transform in transforms:
-        data_transform = transforms.Compose([
-            transforms.Resize((args.resize, args.resize)),
-            transform,
-            transforms.ToTensor(),
-            CastTensor('torch.FloatTensor'),
-            transforms.Normalize([40414.038877341736], [35951.78672059086])
-            ])
+#         test_dataset = LenslessDataset.LenslessDataset(
+#         csv_file= args.test_csv,
+#         root_dir= args.root_dir,
+#         transform= data_transform
+#         )
 
-        test_dataset = LenslessDataset.LenslessDataset(
-        csv_file= args.test_csv,
-        root_dir= args.root_dir,
-        transform= data_transform
-        )
+#         test_loader = torch.utils.data.DataLoader(
+#         test_dataset,
+#         batch_size= args.batch_size,
+#         shuffle= True,
+#         num_workers= 2,
+#         pin_memory= True
+#         )
 
-        test_loader = torch.utils.data.DataLoader(
-        test_dataset,
-        batch_size= args.batch_size,
-        shuffle= True,
-        num_workers= 2,
-        pin_memory= True
-        )
-
-        test_epoch(model, test_loader, device)
-
+#         test_epoch(model, test_loader, device)
 
 def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, accumulation_steps= 16):
     model.train()
