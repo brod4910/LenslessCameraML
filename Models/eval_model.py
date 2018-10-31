@@ -12,7 +12,7 @@ from normalize import CastTensor
 from torchvision import datasets, transforms
 import numpy as np
 import torch.nn.functional as F
-from train import test_epoch
+# from train import test_epoch
 
 def CreateArgsParser():
     parser =  argparse.ArgumentParser(description='Evaluate Pretrained Model')
@@ -111,44 +111,6 @@ def main():
     # pin_memory= True
     # )
 
-    evaluate_model(network, device, args, Bias=args.bias, Shift= args.shift, Gaussian=args.gaussian)
-
-def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None):
-    data_transforms = []
-
-    if Bias is not None:
-        data_transforms += [BiasNoise(Bias)]
-    if Shift is not None:
-        data_transforms += [Shift(np.float32([[1, 0, Shift], [0, 1, 0]]))]
-    if Gaussian is not None:
-        data_transforms += [GaussianNoise(Gaussian)]
-
-    for d_transform in data_transforms:
-        data_transform = transforms.Compose([
-            transforms.Resize((args.resize, args.resize)),
-            d_transform,
-            transforms.ToTensor(),
-            CastTensor('torch.FloatTensor'),
-            transforms.Normalize([40414.038877341736], [35951.78672059086])
-            ])
-
-        test_dataset = LenslessDataset.LenslessDataset(
-        csv_file= args.test_csv,
-        root_dir= args.root_dir,
-        transform= data_transform
-        )
-
-        test_loader = torch.utils.data.DataLoader(
-        test_dataset,
-        batch_size= args.batch_size,
-        shuffle= True,
-        num_workers= 2,
-        pin_memory= True
-        )
-
-        test_epoch(model, test_loader, device)
-
-
 '''
 Shifts the image by shift. Shift here IS the shifting array.
 The shifting matrix has dimensions 2x3 Ex: [[1, 0, s], [0, 1, t]], where s and t are the shifting constants
@@ -195,7 +157,7 @@ class GaussianNoise(object):
     def __call__(self, img):
         noisy_img = np.array(img, dtype= np.float)
         rows, cols = noisy_img.shape
-        noisy_img = img + np.random.normal(self.mean, self.std, img.shape)
+        noisy_img = img + np.random.normal(self.mean, self.std, noisy_img.shape)
         noisy_img = noisy_img.reshape((cols, rows, 1))
         # noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 

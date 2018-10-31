@@ -55,6 +55,12 @@ def CreateArgsParser():
                     help='Feature layers to be used during training. List of feature layers are in models.py.')
     parser.add_argument('--c-layers', required= True, default=None,
                     help='Classifying layers to be used during training. List of classifier layers are in models.py.')
+    parser.add_argument('--gaussian', default= None, type= int,
+                    help='Adds gaussian noise with std given by user')
+    parser.add_argument('--shift', default= None, type= int, 
+                    help='Shifts the image by the int given by user')
+    parser.add_argument('--bias', default= None, type= int,
+                    help='Adds bias noise to the image by the int given by user')
 
     return parser
 
