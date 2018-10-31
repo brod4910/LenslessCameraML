@@ -11,6 +11,8 @@ import LenslessDataset
 from normalize import CastTensor
 from torchvision import datasets, transforms
 import numpy as np
+import torch.nn.functional as F
+from train import evaluate_model
 
 def CreateArgsParser():
     parser =  argparse.ArgumentParser(description='Evaluate Pretrained Model')
@@ -21,14 +23,17 @@ def CreateArgsParser():
                     help='root directory where enclosing image files are located')
     parser.add_argument('--test-csv', required= True, 
                     help='path to the location of the test csv')
-    parser.add_argument('--train-csv', required= True, 
-                    help='path to the location of the training csv')
-    parser.add_argument('--guassian', default= None, type= int,
+    parser.add_argument('--Gaussian', default= None, type= int,
                     help='Adds gaussian noise with std given by user')
     parser.add_argument('--shift', default= None, type= int, 
                     help='Shifts the image by the int given by user')
     parser.add_argument('--bias', default= None, type= int,
                     help='Adds bias noise to the image by the int given by user')
+    parser.add_argument('--batch-size', type=int, default=64, metavar='N',
+                    help='input batch size for training (default: 64)')
+    parser.add_argument('--resize', required= True, type=int, default=None, 
+                    help='dimensions of both height and width to be resized')
+
     return parser
 
 def main():
@@ -74,10 +79,10 @@ def main():
         CastTensor('torch.FloatTensor'),
         transforms.Normalize([40414.038877341736], [35951.78672059086])
         ])
-    elif args.guassian is not None:
+    elif args.Gaussian is not None:
         data_transform = transforms.Compose([
         transforms.Resize((resize, resize)),
-        GuassianNoise(args.gaussian),
+        GaussianNoise(args.gaussian),
         transforms.ToTensor(),
         CastTensor('torch.FloatTensor'),
         transforms.Normalize([40414.038877341736], [35951.78672059086])
@@ -91,48 +96,22 @@ def main():
         transforms.Normalize([40414.038877341736], [35951.78672059086])
         ])
 
-    # load the test dataset
-    test_dataset = LenslessDataset.LenslessDataset(
-    csv_file= args.test_csv,
-    root_dir= args.root_dir,
-    transform= data_transform
-    )
+    # # load the test dataset
+    # test_dataset = LenslessDataset.LenslessDataset(
+    # csv_file= args.test_csv,
+    # root_dir= args.root_dir,
+    # transform= data_transform
+    # )
 
-    test_loader = torch.utils.data.DataLoader(
-    test_dataset,
-    batch_size= batch_size,
-    shuffle= True,
-    num_workers= 2,
-    pin_memory= True
-    )
+    # test_loader = torch.utils.data.DataLoader(
+    # test_dataset,
+    # batch_size= batch_size,
+    # shuffle= True,
+    # num_workers= 2,
+    # pin_memory= True
+    # )
 
-    test_epoch(network, test_loader, device)
-
-def test_epoch(model, test_loader, device):
-    test_loss = 0
-    accuracy = 0
-    correct = 0
-
-    # validate the model over the test set and record no gradient history
-    with torch.no_grad():
-        for batch_idx, (input, target) in enumerate(test_loader):
-
-            input, target = input.to(device), target.to(device)
-
-            output = model(input)
-            # sum up batch loss
-            test_loss += F.cross_entropy(output, target, size_average=False).item()
-            # get the index of the max log-probability
-            pred = output.max(1, keepdim=True)[1]
-            correct += pred.eq(target.view_as(pred)).sum().item()
-            
-            del input, target, output
-
-    test_loss /= len(test_loader.dataset)
-    accuracy = 100. * correct / len(test_loader.dataset)
-    print('\nTest set: Average loss: {:.4f}, Accuracy: {}/{} ({:.1f}%)\n'
-          .format(test_loss, correct, len(test_loader.dataset),
-                  100. * correct / len(test_loader.dataset)))
+    evaluate_model(network, device, args, Bias=args.Bias, Shift= args.Shift, Gaussian=args.Gaussian)
 
 '''
 Shifts the image by shift. Shift here IS the shifting array.
@@ -169,10 +148,10 @@ class BiasNoise(object):
         return noisy_img
 
 '''
-Adds Guassian Noise to the image with mean and std.
+Adds Gaussian Noise to the image with mean and std.
 The bias is added when the object is called
 '''
-class GuassianNoise(object):
+class GaussianNoise(object):
     def __init__(self, mean, std):
         self.mean = mean
         self.std = std
