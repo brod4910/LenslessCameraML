@@ -188,7 +188,7 @@ Adds Gaussian Noise to the image with mean and std.
 The bias is added when the object is called
 '''
 class GaussianNoise(object):
-    def __init__(self, mean, std):
+    def __init__(self, std, mean=0):
         self.mean = mean
         self.std = std
 
