@@ -152,7 +152,7 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
 
     for transform in transforms:
         data_transform = transforms.Compose([
-            transforms.Resize((resize, resize)),
+            transforms.Resize((args.resize, args.resize)),
             transform,
             transforms.ToTensor(),
             CastTensor('torch.FloatTensor'),
