@@ -23,7 +23,7 @@ def CreateArgsParser():
                     help='root directory where enclosing image files are located')
     parser.add_argument('--test-csv', required= True, 
                     help='path to the location of the test csv')
-    parser.add_argument('--Gaussian', default= None, type= int,
+    parser.add_argument('--gaussian', default= None, type= int,
                     help='Adds gaussian noise with std given by user')
     parser.add_argument('--shift', default= None, type= int, 
                     help='Shifts the image by the int given by user')
@@ -79,7 +79,7 @@ def main():
         CastTensor('torch.FloatTensor'),
         transforms.Normalize([40414.038877341736], [35951.78672059086])
         ])
-    elif args.Gaussian is not None:
+    elif args.gaussian is not None:
         data_transform = transforms.Compose([
         transforms.Resize((resize, resize)),
         GaussianNoise(args.gaussian),
@@ -111,22 +111,22 @@ def main():
     # pin_memory= True
     # )
 
-    evaluate_model(network, device, args, Bias=args.Bias, Shift= args.Shift, Gaussian=args.Gaussian)
+    evaluate_model(network, device, args, Bias=args.bias, Shift= args.shift, Gaussian=args.gaussian)
 
 def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None):
-    transforms = []
+    data_transforms = []
 
     if Bias is not None:
-        transforms += [BiasNoise(Bias)]
+        data_transforms += [BiasNoise(Bias)]
     if Shift is not None:
-        transforms += [Shift(np.float32([[1, 0, Shift], [0, 1, 0]]))]
+        data_transforms += [Shift(np.float32([[1, 0, Shift], [0, 1, 0]]))]
     if Gaussian is not None:
-        transforms += [GaussianNoise(Gaussian)]
+        data_transforms += [GaussianNoise(Gaussian)]
 
-    for transform in transforms:
+    for d_transform in data_transforms:
         data_transform = transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
-            transform,
+            d_transform,
             transforms.ToTensor(),
             CastTensor('torch.FloatTensor'),
             transforms.Normalize([40414.038877341736], [35951.78672059086])
