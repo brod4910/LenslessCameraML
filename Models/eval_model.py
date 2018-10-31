@@ -195,7 +195,7 @@ class GaussianNoise(object):
     def __call__(self, img):
         noisy_img = np.array(img, dtype= np.float)
         rows, cols = noisy_img.shape
-        noisy_img = img + np.random.normal(mean, std, img.shape)
+        noisy_img = img + np.random.normal(self.mean, self.std, img.shape)
         noisy_img = noisy_img.reshape((cols, rows, 1))
         # noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 
