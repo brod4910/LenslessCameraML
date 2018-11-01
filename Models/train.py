@@ -11,6 +11,7 @@ import shutil
 import LenslessDataset
 from normalize import CastTensor
 from eval_model import BiasNoise, Shift, GaussianNoise
+from sklearn.model_selection import KFold
 
 def train(args, model, device, checkpoint):
 
@@ -139,9 +140,8 @@ def train(args, model, device, checkpoint):
 
         is_best = False
 
-        if (epoch) % 5:
-            print("Evaluating model at epoch: {}".format(epoch))
-            evaluate_model(model, device, args, Bias=args.bias, Shift= args.shift, Gaussian=args.gaussian)
+        print("Evaluating model at epoch: {}".format(epoch))
+        evaluate_model(model, device, args, Bias=args.bias, Shift= args.shift, Gaussian=args.gaussian)
 
 def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None):
     data_transforms = []
@@ -250,3 +250,12 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
     if is_best:
         shutil.copyfile(filename, 'model_best.pth.tar')
+
+def kFold(inputs):
+        kfold = KFold(5, False, 11)
+        idxs = []
+
+        for train, test in enumerate(kfold.split(inputs)):
+            idxs.append((train, test))
+
+        return idxs
