@@ -9,8 +9,7 @@ import time
 import sys
 import shutil
 import LenslessDataset
-from normalize import CastTensor
-from eval_model import BiasNoise, Shift, GaussianNoise
+from normalize import CastTensor, BiasNoise, Shift, GaussianNoise, MaxNormalization
 from sklearn.model_selection import KFold
 
 def train(args, model, device, checkpoint):
@@ -38,9 +37,10 @@ def train(args, model, device, checkpoint):
     else:
         data_transform = transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
+            MaxNormalization(0.0038910505836575876),
             transforms.ToTensor(),
             CastTensor('torch.FloatTensor'),
-            transforms.Normalize([40414.038877341736], [35951.78672059086])
+            transforms.Normalize([157.11056947927852], [139.749640327443])
             ])
 
     print("\nImages resized to %d x %d" % (args.resize, args.resize))
@@ -156,10 +156,11 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
     for d_transform in data_transforms:
         data_transform = transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
+            MaxNormalization(0.0038910505836575876),
             d_transform,
             transforms.ToTensor(),
             CastTensor('torch.FloatTensor'),
-            transforms.Normalize([40414.038877341736], [35951.78672059086])
+            transforms.Normalize([157.11056947927852], [139.749640327443])
             ])
 
         test_dataset = LenslessDataset.LenslessDataset(
@@ -250,12 +251,3 @@ def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
     if is_best:
         shutil.copyfile(filename, 'model_best.pth.tar')
-
-def kFold(inputs):
-        kfold = KFold(5, False, 11)
-        idxs = []
-
-        for train, test in enumerate(kfold.split(inputs)):
-            idxs.append((train, test))
-
-        return idxs

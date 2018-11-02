@@ -110,59 +110,6 @@ def main():
     # num_workers= 2,
     # pin_memory= True
     # )
-
-'''
-Shifts the image by shift. Shift here IS the shifting array.
-The shifting matrix has dimensions 2x3 Ex: [[1, 0, s], [0, 1, t]], where s and t are the shifting constants
-and the array is an np.float32
-'''
-class Shift(object):
-    def __init__(self, shift):
-        self.shift = shift
-
-    def __call__(self, img):
-        im = np.array(img, dtype= np.float)
-        rows, cols = im.shape
-        shifted_img = cv2.wrapAffine(im, self.shift, (cols, rows))
-
-        return shifted_img
-
-# class Defocus(network, batch_size, device, test_csv, root_dir):
-
-'''
-Adds bias noise to the input image.
-The bias is added when the object is called
-'''
-class BiasNoise(object):
-    def __init__(self, bias_noise):
-        self.bias_noise = bias_noise
-
-    def __call__(self, img):
-        noisy_img = np.array(img, dtype= np.float) + self.bias_noise
-        rows, cols = noisy_img.shape
-        noisy_img = noisy_img.reshape((cols, rows, 1))
-        # noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
-
-        return noisy_img
-
-'''
-Adds Gaussian Noise to the image with mean and std.
-The bias is added when the object is called
-'''
-class GaussianNoise(object):
-    def __init__(self, std, mean=0):
-        self.mean = mean
-        self.std = std
-
-    def __call__(self, img):
-        noisy_img = np.array(img, dtype= np.float)
-        rows, cols = noisy_img.shape
-        noisy_img = img + np.random.normal(self.mean, self.std, noisy_img.shape)
-        noisy_img = noisy_img.reshape((cols, rows, 1))
-        # noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
-
-        return noisy_img
-
     
 if __name__ == '__main__':
     main()
