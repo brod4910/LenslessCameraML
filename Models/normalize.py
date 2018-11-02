@@ -117,17 +117,17 @@ Shifts the image by shift. Shift here IS the shifting array.
 The shifting matrix has dimensions 2x3 Ex: [[1, 0, s], [0, 1, t]], where s and t are the shifting constants
 and the array is an np.float32
 '''
-class Shift(object):
+class TranslateImage(object):
     def __init__(self, shift):
         self.shift = shift
 
     def __call__(self, img):
-        shifted_img = np.array(img, dtype= np.float)
-        rows, cols, chan  = shifted_img.shape
-        shifted_img = cv2.warpAffine(shifted_img, self.shift, (cols, rows))
-        shifted_img = shifted_img.reshape((cols, rows, chan))
+        translated_img = np.array(img, dtype= np.float)
+        rows, cols, chan  = translated_img.shape
+        translated_img = cv2.warpAffine(translated_img, self.shift, (cols, rows))
+        translated_img = translated_img.reshape((cols, rows, chan))
 
-        return shifted_img
+        return translated_img
 
 # class Defocus(network, batch_size, device, test_csv, root_dir):
 

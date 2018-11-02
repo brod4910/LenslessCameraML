@@ -9,7 +9,7 @@ import time
 import sys
 import shutil
 import LenslessDataset
-from normalize import CastTensor, BiasNoise, Shift, GaussianNoise, MaxNormalization
+from normalize import CastTensor, BiasNoise, TranslateImage, GaussianNoise, MaxNormalization
 from sklearn.model_selection import KFold
 import numpy as np
 
@@ -150,7 +150,7 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
     if Bias is not None:
         data_transforms += [BiasNoise(Bias)]
     if Shift is not None:
-        data_transforms += [Shift(np.float32([[1, 0, Shift], [0, 1, 0]]))]
+        data_transforms += [TranslateImage(np.float32([[1, 0, Shift], [0, 1, 0]]))]
     if Gaussian is not None:
         data_transforms += [GaussianNoise(Gaussian)]
 
