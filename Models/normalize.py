@@ -123,9 +123,9 @@ class Shift(object):
 
     def __call__(self, img):
         shifted_img = np.array(img, dtype= np.float)
-        rows, cols= shifted_img.shape
+        rows, cols, chan  = shifted_img.shape
         shifted_img = cv2.warpAffine(shifted_img, self.shift, (cols, rows))
-        shifted_img = shifted_img.reshape((cols, rows, 1))
+        shifted_img = shifted_img.reshape((cols, rows, chan))
 
         return shifted_img
 
@@ -140,12 +140,12 @@ class BiasNoise(object):
         self.bias_noise = bias_noise
 
     def __call__(self, img):
-        noisy_img = np.array(noisy_img, dtype= np.float) + self.bias_noise
-        rows, cols = noisy_img.shape
-        noisy_img = noisy_img.reshape((cols, rows, 1))
+        noisy_img = np.array(img, dtype= np.float) + self.bias_noise
+        rows, cols, chan = noisy_img.shape
+        noisy_img = noisy_img.reshape((cols, rows, chan))
         noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 
-        return noisy_img
+        return noisy_img_clipped
 
 '''
 Adds Gaussian Noise to the image with mean and std.
@@ -158,12 +158,12 @@ class GaussianNoise(object):
 
     def __call__(self, img):
         noisy_img = np.array(img, dtype= np.float)
-        rows, cols = noisy_img.shape
+        rows, cols, chan = noisy_img.shape
         noisy_img = noisy_img + np.random.normal(self.mean, self.std, noisy_img.shape)
-        noisy_img = noisy_img.reshape((cols, rows, 1))
+        noisy_img = noisy_img.reshape((cols, rows, chan))
         noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
 
-        return noisy_img
+        return noisy_img_clipped
 
 class MaxNormalization(object):
     def __init__(self, max_val):
@@ -171,5 +171,7 @@ class MaxNormalization(object):
 
     def __call__(self, img):
         norm_img = np.array(img, dtype= np.float) * self.max
+        rows, cols = norm_img.shape
+        norm_img = norm_img.reshape((cols, rows, 1))
 
         return norm_img
