@@ -124,7 +124,8 @@ class Shift(object):
     def __call__(self, img):
         shifted_img = np.array(img, dtype= np.float)
         rows, cols= shifted_img.shape
-        shifted_img = cv2.warpAffine(im, self.shift, (cols, rows))
+        shifted_img = cv2.warpAffine(shifted_img, self.shift, (cols, rows))
+        shifted_img = shifted_img.reshape((cols, rows, 1))
 
         return shifted_img
 
@@ -172,5 +173,5 @@ class MaxNormalization(object):
         norm_img = np.array(img, dtype= np.float) * self.max
         rows, cols = norm_img.shape
         norm_img = norm_img.reshape((cols, rows, 1))
-        
+
         return norm_img
