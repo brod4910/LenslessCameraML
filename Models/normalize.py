@@ -171,7 +171,5 @@ class MaxNormalization(object):
 
     def __call__(self, img):
         norm_img = np.array(img, dtype= np.float) * self.max
-        rows, cols = norm_img.shape
-        norm_img = norm_img.reshape((cols, rows, 1))
 
         return norm_img
