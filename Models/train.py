@@ -3,73 +3,93 @@ import torch
 import torch.optim as optim
 import torch.nn.functional as F
 from torch.autograd import Variable
-from torchvision import datasets, transforms
+from torchvision import transforms
 import torch.backends.cudnn as cudnn
 import time
-import sys
 import shutil
 import LenslessDataset
-from normalize import CastTensor, BiasNoise, TranslateImage, GaussianNoise, MaxNormalization
+from normalize import CastTensor, BiasNoise, TranslateImage, GaussianNoise, MaxNormalization, PeriodicShift
 from sklearn.model_selection import KFold
 import numpy as np
 
 def train(args, model, device, checkpoint):
 
+    data_transforms = []
     # Data transformations
-    if args.hflip is True and args.vflip is False:
-        data_transform = transforms.Compose([
-            transforms.Resize((args.resize, args.resize)),
-            transforms.RandomHorizontalFlip(),
-            transforms.ToTensor()
-            ])
-    elif args.vflip is True and args.hflip is False:
-        data_transform = transforms.Compose([
-            transforms.Resize((args.resize, args.resize)),
-            transforms.RandomVerticalFlip(),
-            transforms.ToTensor()
-            ])
-    elif args.vflip is True and args.hflip is True:
-        data_transform = transforms.Compose([
-            transforms.Resize((args.resize, args.resize)),
-            transforms.RandomHorizontalFlip(),
-            transforms.RandomVerticalFlip(),
-            transforms.ToTensor()
-            ])
-    else:
-        data_transform = transforms.Compose([
+    # if args.hflip is True and args.vflip is False:
+    #     data_transform = transforms.Compose([
+    #         transforms.Resize((args.resize, args.resize)),
+    #         transforms.RandomHorizontalFlip(),
+    #         transforms.ToTensor()
+    #         ])
+    # elif args.vflip is True and args.hflip is False:
+    #     data_transform = transforms.Compose([
+    #         transforms.Resize((args.resize, args.resize)),
+    #         transforms.RandomVerticalFlip(),
+    #         transforms.ToTensor()
+    #         ])
+    # elif args.vflip is True and args.hflip is True:
+    #     data_transform = transforms.Compose([
+    #         transforms.Resize((args.resize, args.resize)),
+    #         transforms.RandomHorizontalFlip(),
+    #         transforms.RandomVerticalFlip(),
+    #         transforms.ToTensor()
+    #         ])
+    # else:
+    # data_transforms += [BiasNoise(Bias)]
+    # data_transforms += [TranslateImage(Shift[0], Shift[1])]
+    # data_transforms += [GaussianNoise(Gaussian)]
+
+    if args.rigor:
+        data_transforms += transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
             MaxNormalization(0.0038910505836575876),
-            transforms.ToTensor(),
-            CastTensor('torch.FloatTensor'),
+            # TranslateImage(args.shift, 0),
+            GaussianNoise(args.gaussian),
+            PeriodicShift(args.shift, random= True),
+            # transforms.ToTensor(),
+            CastTensor(),
             transforms.Normalize([157.11056947927852], [139.749640327443])
-            ])
+            ])   
+
+    data_transforms += transforms.Compose([
+        transforms.Resize((args.resize, args.resize)),
+        MaxNormalization(0.0038910505836575876),
+        CastTensor(),
+        transforms.Normalize([157.11056947927852], [139.749640327443])
+        ])
 
     print("\nImages resized to %d x %d" % (args.resize, args.resize))
 
-    # create both training and testing datasets
-    train_dataset = LenslessDataset.LenslessDataset(
+    train_datasets = []
+    test_datasets = []
+
+    train_loaders = []
+    test_loaders = []
+
+    for idx, data_transform in enumerate(data_transforms):
+        train_datasets += LenslessDataset.LenslessDataset(
         csv_file= args.train_csv,
         root_dir= args.root_dir,
         transform= data_transform
         )
-
-    test_dataset = LenslessDataset.LenslessDataset(
+        test_datasets += LenslessDataset.LenslessDataset(
         csv_file= args.test_csv,
         root_dir= args.root_dir,
         transform= data_transform
         )
-    # use the torch dataloader class to enumerate over the data during training
-    train_loader = torch.utils.data.DataLoader(
-        train_dataset, 
-        batch_size= args.batch_size, 
+
+        train_loaders += torch.utils.data.DataLoader(
+        train_datasets[idx], 
+        batch_size= args.batch_size if not args.rigor else args.batch_size/2, 
         shuffle= True, 
         num_workers= args.num_processes,
         pin_memory= True
         )
 
-    test_loader = torch.utils.data.DataLoader(
-        test_dataset,
-        batch_size= args.batch_size,
+        test_loaders += torch.utils.data.DataLoader(
+        test_datasets[idx],
+        batch_size= args.batch_size if not args.rigor else args.batch_size/2,
         shuffle= True,
         num_workers = args.num_processes,
         pin_memory= True
@@ -85,7 +105,7 @@ def train(args, model, device, checkpoint):
     elif args.optimizer == 'RMS':
         optimizer = optim.RMSprop(model.parameters(), lr=args.lr, alpha=0.99, eps=1e-08, weight_decay= 0 if args.weight_decay is None else args.weight_decay, momentum=args.momentum, centered=False)
     elif args.optimizer == 'Adam':
-        optimizer = optim.Adam(model.parameters(), lr=0.001, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False)
+        optimizer = optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False)
 
     if checkpoint is not None:
         optimizer.load_state_dict(checkpoint['optimizer'])
@@ -114,8 +134,8 @@ def train(args, model, device, checkpoint):
     # train and validate the model accordingly
     total_time = time.clock()
     for epoch in range(args.start_epoch, args.epochs + 1):
-        train_epoch(epoch, args, model, optimizer, criterion, train_loader, device)
-        test_loss, accuracy = test_epoch(model, test_loader, device)
+        train_epoch(epoch, args, model, optimizer, criterion, train_loaders, device)
+        test_loss, accuracy = test_epoch(model, test_loaders, device)
 
         if args.plateau == 'loss':
             scheduler.step(test_loss)
@@ -142,7 +162,7 @@ def train(args, model, device, checkpoint):
         is_best = False
 
         print("Evaluating model at epoch: {}".format(epoch))
-        evaluate_model(model, device, args, Bias=args.bias, Shift= args.shift, Gaussian=args.gaussian)
+        evaluate_model(model, device, args, Bias=args.bias, Shift= (args.shift, 0), Gaussian=args.gaussian)
 
 def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None):
     data_transforms = []
@@ -150,7 +170,8 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
     if Bias is not None:
         data_transforms += [BiasNoise(Bias)]
     if Shift is not None:
-        data_transforms += [TranslateImage(np.float32([[1, 0, Shift], [0, 1, 0]]))]
+        # data_transforms += [TranslateImage(Shift[0], Shift[1])]
+        data_transforms += [PeriodicShift(Shift[0])]
     if Gaussian is not None:
         data_transforms += [GaussianNoise(Gaussian)]
 
@@ -159,7 +180,7 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
             transforms.Resize((args.resize, args.resize)),
             MaxNormalization(0.0038910505836575876),
             d_transform,
-            transforms.ToTensor(),
+            # transforms.ToTensor(),
             CastTensor('torch.FloatTensor'),
             transforms.Normalize([157.11056947927852], [139.749640327443])
             ])
@@ -180,15 +201,16 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
 
         test_epoch(model, test_loader, device)
 
-def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, accumulation_steps= 16):
+def train_epoch(epoch, args, model, optimizer, criterion, train_loaders, device, accumulation_steps= 16):
     model.train()
 
     total_train_loss = 0
     batch_loss = 0
 
     optimizer.zero_grad()                                   # Reset gradients tensors
+    size = len(train_loaders)
 
-    for batch_idx, (inputs, targets) in enumerate(train_loader):
+    for batch_idx, (inputs, targets) in enumerate(train_loaders[0] if size == 1 else zip(train_loaders[0], train_loaders[1])):
 
         inputs, targets = inputs.to(device), targets.to(device)
 
@@ -208,8 +230,8 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
 
         if (batch_idx + 1) % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(inputs), len(train_loader.dataset),
-                100. * batch_idx / len(train_loader), loss.item()))
+                epoch, batch_idx * len(inputs), sum(len(t.dataset) for t in train_loaders),
+                100. * batch_idx / sum(len(t.dataset) for t in train_loaders), loss.item()))
         # report the train metrics depending on the log interval
 
         #     batch_loss = 0 

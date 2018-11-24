@@ -1,13 +1,12 @@
-# %load normalize.py
 import os
 import sys
 import argparse
-from sklearn.preprocessing import MinMaxScaler
-from sklearn.preprocessing import StandardScaler
-from sklearn.preprocessing import RobustScaler
+from sklearn.preprocessing import MinMaxScaler, StandardScaler, RobustScaler
 import numpy as np
 from PIL import Image
 import pandas as pd
+import cv2
+import torch
 
 '''
 Fits the training to a Scaler. Scaler can be Standard or MinMax.
@@ -103,31 +102,58 @@ class RunningStats:
     def standard_deviation(self):
         return np.sqrt(self.variance())
 
+'''
+Casts a numpy array to torch tensor
+'''
 class CastTensor(object):
-    def __init__(self, dtype):
-        self.type = dtype
+    def __init__(self):
 
     def __call__(self, image):
-        img = image.type(self.type)
+        img = torch.from_numpy(image.transpose((2, 0, 1)))
 
         return img
 
 '''
-Shifts the image by shift. Shift here IS the shifting array.
+Shifts the image by s and t.
 The shifting matrix has dimensions 2x3 Ex: [[1, 0, s], [0, 1, t]], where s and t are the shifting constants
 and the array is an np.float32
 '''
 class TranslateImage(object):
-    def __init__(self, shift):
-        self.shift = shift
+    def __init__(self, s, t, random= False):
+        self.s = s
+        self.t = t
+        self.random = random
 
     def __call__(self, img):
+        shift = np.float32([[1, 0, self.s], [0, 1, self.t]])
+        if self.random:
+            shift[0,2] = np.random.randint(-self.s, self.s+1)
+
         translated_img = np.array(img, dtype= np.float)
         rows, cols, chan  = translated_img.shape
-        translated_img = cv2.warpAffine(translated_img, self.shift, (cols, rows))
+        translated_img = cv2.warpAffine(translated_img, shift, (cols, rows))
         translated_img = translated_img.reshape((cols, rows, chan))
 
         return translated_img
+
+'''
+Performs a periodic shift of the image. Meaning that the image is shifted over by shift 
+but the pixels wrap around so they are not lost.
+'''
+class PeriodicShift(object):
+    def __init__(self, shift, random= False):
+        self.shift = shift
+        self.random = random
+
+    def __call__(self, img):
+        s = self.shift
+        if self.random:
+            s = np.random.randint(-self.shift, self.shift+1)
+
+        img_array = np.array(img, dtype=np.float)
+        rolled_img = np.roll(img_array, shift= s, axis=1)
+
+        return rolled_img
 
 # class Defocus(network, batch_size, device, test_csv, root_dir):
 
@@ -136,11 +162,16 @@ Adds bias noise to the input image.
 The bias is added when the object is called
 '''
 class BiasNoise(object):
-    def __init__(self, bias_noise):
+    def __init__(self, bias_noise, random= False):
         self.bias_noise = bias_noise
+        self.random = random
 
     def __call__(self, img):
-        noisy_img = np.array(img, dtype= np.float) + self.bias_noise
+        bn = self.bias_noise
+        if self.random:
+            bn = np.randm.randint(-self.bias_noise, self.bias_noise+1)
+
+        noisy_img = np.array(img, dtype= np.float) + bn
         rows, cols, chan = noisy_img.shape
         noisy_img = noisy_img.reshape((cols, rows, chan))
         noisy_img_clipped = np.clip(noisy_img, 0, 255)  # we might get out of bounds due to noise
