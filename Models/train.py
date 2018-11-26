@@ -66,13 +66,13 @@ def train(args, model, device, checkpoint):
 
     for idx, data_transform in enumerate(data_transforms):
         train_datasets.append(LenslessDataset.LenslessDataset(
-        csv_file= train_csv,
-        root_dir= root_dir,
+        csv_file= args.train_csv,
+        root_dir= args.root_dir,
         transform= data_transform
         ))
         test_datasets.append(LenslessDataset.LenslessDataset(
-        csv_file= test_csv,
-        root_dir= root_dir,
+        csv_file= args.test_csv,
+        root_dir= args.root_dir,
         transform= data_transform
         ))
 
@@ -132,8 +132,8 @@ def train(args, model, device, checkpoint):
     # train and validate the model accordingly
     total_time = time.clock()
     for epoch in range(args.start_epoch, args.epochs + 1):
-        train_epoch(epoch, args, model, optimizer, criterion, train_loaders, device)
-        test_loss, accuracy = test_epoch(model, test_loaders, device)
+        train_epoch(epoch, args, model, optimizer, criterion, train_loader, device)
+        test_loss, accuracy = test_epoch(model, test_loader, device)
 
         if args.plateau == 'loss':
             scheduler.step(test_loss)
@@ -172,8 +172,8 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
         data_transforms.append([PeriodicShift(Shift[0])])
     if Gaussian is not None:
         data_transforms.append([GaussianNoise(Gaussian)])
-    if args.rigor
-        data_transforms_transforms.append([PeriodicShift(Shift[0], random= args.rigor), GaussianNoise(Gaussian)])
+    if args.rigor:
+        data_transforms.append([PeriodicShift(Shift[0], random= args.rigor), GaussianNoise(Gaussian)])
 
     for d_transform in data_transforms:
         data_transform = transforms.Compose([
