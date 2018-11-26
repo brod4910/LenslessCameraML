@@ -48,14 +48,14 @@ def train(args, model, device, checkpoint):
             # TranslateImage(args.shift, 0),
             GaussianNoise(args.gaussian),
             PeriodicShift(args.shift, random= args.rigor),
-            CastTensor(''),
+            CastTensor(),
             transforms.Normalize([157.11056947927852], [139.749640327443])
             ]))
 
     data_transforms.append(transforms.Compose([
         transforms.Resize((args.resize, args.resize)),
         MaxNormalization(0.0038910505836575876),
-        CastTensor(''),
+        CastTensor(),
         transforms.Normalize([157.11056947927852], [139.749640327443])
         ]))
 
@@ -180,8 +180,7 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
             transforms.Resize((args.resize, args.resize)),
             MaxNormalization(0.0038910505836575876),
             *d_transform,
-            # transforms.ToTensor(),
-            CastTensor('torch.FloatTensor'),
+            CastTensor(),
             transforms.Normalize([157.11056947927852], [139.749640327443])
             ])
 

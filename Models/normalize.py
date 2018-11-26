@@ -106,8 +106,8 @@ class RunningStats:
 Casts a numpy array to torch tensor
 '''
 class CastTensor(object):
-    def __init__(self, type):
-        self.type = type
+    def __init__(self):
+        pass
 
     def __call__(self, image):
         img = torch.from_numpy(image.transpose((2, 0, 1)))
