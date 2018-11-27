@@ -228,8 +228,8 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
 
         if (batch_idx + 1) % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
-                epoch, batch_idx * len(inputs), len(train_loader.dataset) * 2,
-                100. * batch_idx / len(train_loader.dataset) * 2, loss.item()))
+                epoch, batch_idx * len(inputs), len(train_loader.dataset),
+                100. * batch_idx / len(train_loader.dataset), loss.item()))
         # report the train metrics depending on the log interval
 
         #     batch_loss = 0 
