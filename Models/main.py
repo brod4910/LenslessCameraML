@@ -63,6 +63,8 @@ def CreateArgsParser():
                     help='Shifts the image by the int given by user')
     parser.add_argument('--bias', default= None, type= int,
                     help='Adds bias noise to the image by the int given by user')
+    parser.add_argument('-ts', '--type-shift', nargs='+', default= None,
+                    help= 'Selects either translate or periodic shifting. t for translate, p for periodic or both')
 
     return parser
 
