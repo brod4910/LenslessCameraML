@@ -45,9 +45,9 @@ def train(args, model, device, checkpoint):
         data_transforms.append(transforms.Compose([
             transforms.Resize((args.resize, args.resize)),
             MaxNormalization(0.0038910505836575876),
-            # TranslateImage(args.shift, 0),
             GaussianNoise(args.gaussian),
-            PeriodicShift(args.shift, random= args.rigor),
+            TranslateImage(args.shift, 0, random= args.rigor),
+            #PeriodicShift(args.shift, random= args.rigor),
             CastTensor(),
             transforms.Normalize([157.11056947927852], [139.749640327443])
             ]))
@@ -168,8 +168,8 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
     if Bias is not None:
         data_transforms.append([BiasNoise(Bias)])
     if Shift is not None:
-        # data_transforms += [TranslateImage(Shift[0], Shift[1])]
-        data_transforms.append([PeriodicShift(Shift[0])])
+        data_transforms.append([TranslateImage(Shift[0], Shift[1])])
+        # data_transforms.append([PeriodicShift(Shift[0])])
     if Gaussian is not None:
         data_transforms.append([GaussianNoise(Gaussian)])
     if args.rigor:
