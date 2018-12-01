@@ -168,8 +168,8 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
     if Bias is not None:
         data_transforms.append([BiasNoise(Bias)])
     if Shift is not None:
-        data_transforms.append([TranslateImage(Shift[0], Shift[1])])
-        # data_transforms.append([PeriodicShift(Shift[0])])
+        data_transforms.append([TranslateImage(Shift[0], Shift[1], random= args.rigor)])
+        # data_transforms.append([PeriodicShift(Shift[0], random= args.rigor)])
     if Gaussian is not None:
         data_transforms.append([GaussianNoise(Gaussian)])
     if args.rigor:
