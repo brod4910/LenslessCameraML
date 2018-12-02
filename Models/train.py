@@ -50,41 +50,40 @@ def train(args, model, device, checkpoint):
         elif 'p' in args.type_shift:
             shift_t = [PeriodicShift(args.shift, random= args.rigor)]
 
-        print(shift_t)
+        data_transforms.append(([transforms.Resize((args.resize, args.resize)),
+                        MaxNormalization(0.0038910505836575876),
+                        None,
+                        CastTensor(),
+                        transforms.Normalize([157.11056947927852], [139.749640327443])], 
+                        [GaussianNoise(args.gaussian),
+                        *shift_t]))
 
-        data_transforms.append(transforms.Compose([
-            transforms.Resize((args.resize, args.resize)),
-            MaxNormalization(0.0038910505836575876),
-            GaussianNoise(args.gaussian),
-            *shift_t,
-            CastTensor(),
-            transforms.Normalize([157.11056947927852], [139.749640327443])
-            ]))
-
-    data_transforms.append(transforms.Compose([
-        transforms.Resize((args.resize, args.resize)),
+    data_transforms.append((
+        [transforms.Resize((args.resize, args.resize)),
         MaxNormalization(0.0038910505836575876),
         CastTensor(),
-        transforms.Normalize([157.11056947927852], [139.749640327443])
-        ]))
+        transforms.Normalize([157.11056947927852], [139.749640327443])], 
+        None))
 
     print("\nImages resized to %d x %d" % (args.resize, args.resize))
+
+    print(data_transforms)
 
     train_datasets = []
     test_datasets = []
 
-    for idx, data_transform in enumerate(data_transforms):
+    for idx, (b, e) in enumerate(data_transforms):
         train_datasets.append(LenslessDataset.LenslessDataset(
         csv_file= args.train_csv,
         root_dir= args.root_dir,
-        transform= data_transform
-        ))
+        bare_transform = b,
+        extra_transform = e))
+        
         test_datasets.append(LenslessDataset.LenslessDataset(
         csv_file= args.test_csv,
         root_dir= args.root_dir,
-        transform= data_transform
-        ))
-
+        bare_transform = b,
+        extra_transform = e))
 
     train_loader = torch.utils.data.DataLoader(
     ConcatDataset(train_datasets), 
@@ -188,22 +187,19 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
         data_transforms.append(shift_t)
     if Gaussian is not None:
         data_transforms.append([GaussianNoise(Gaussian)])
-    if args.rigor:
-        data_transforms.append([PeriodicShift(Shift[0], random= args.rigor), GaussianNoise(Gaussian)])
 
     for d_transform in data_transforms:
-        data_transform = transforms.Compose([
-            transforms.Resize((args.resize, args.resize)),
+        data_transform = [transforms.Resize((args.resize, args.resize)),
             MaxNormalization(0.0038910505836575876),
             *d_transform,
             CastTensor(),
             transforms.Normalize([157.11056947927852], [139.749640327443])
-            ])
+            ]
 
         test_dataset = LenslessDataset.LenslessDataset(
         csv_file= args.test_csv,
         root_dir= args.root_dir,
-        transform= data_transform
+        bare_transform= data_transform
         )
 
         test_loader = torch.utils.data.DataLoader(
