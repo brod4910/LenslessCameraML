@@ -62,7 +62,7 @@ def train(args, model, device, checkpoint):
         [transforms.Resize((args.resize, args.resize)),
         MaxNormalization(0.0038910505836575876),
         CastTensor(),
-        transforms.Normalize([157.11056947927852], [139.749640327443])], 
+        transforms.Normalize([157.11056947927852], [139.749640327443])],
         None))
 
     print("\nImages resized to %d x %d" % (args.resize, args.resize))
@@ -173,20 +173,24 @@ def train(args, model, device, checkpoint):
 def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None):
     data_transforms = []
 
-    if Bias is not None:
-        data_transforms.append([BiasNoise(Bias)])
-    if Shift is not None:
-        if 't' in args.type_shift and 'p' in args.type_shift:
-            shift_t = [TranslateImage(args.shift, 0, random= args.rigor),
-                    PeriodicShift(args.shift, random= args.rigor)]
-        elif 't' in args.type_shift:
-            shift_t = [TranslateImage(args.shift, 0, random= args.rigor)]
-        elif 'p' in args.type_shift:
-            shift_t = [PeriodicShift(args.shift, random= args.rigor)]
+    # if Bias is not None:
+    #     data_transforms.append([BiasNoise(Bias)])
+    # if Shift is not None:
+    #     if 't' in args.type_shift and 'p' in args.type_shift:
+    #         shift_t = [TranslateImage(args.shift, 0, random= args.rigor),
+    #                 PeriodicShift(args.shift, random= args.rigor)]
+    #     elif 't' in args.type_shift:
+    #         shift_t = [TranslateImage(args.shift, 0, random= args.rigor)]
+    #     elif 'p' in args.type_shift:
+    #         shift_t = [PeriodicShift(args.shift, random= args.rigor)]
 
-        data_transforms.append(shift_t)
-    if Gaussian is not None:
-        data_transforms.append([GaussianNoise(Gaussian)])
+    #     data_transforms.append(shift_t)
+    # if Gaussian is not None:
+    #     data_transforms.append([GaussianNoise(Gaussian)])
+
+    data_transforms.append([PeriodicShift(10)])
+    data_transforms.append([PeriodicShift(25)])
+    data_transforms.append([PeriodicShift(50)])
 
     for d_transform in data_transforms:
         data_transform = [transforms.Resize((args.resize, args.resize)),
