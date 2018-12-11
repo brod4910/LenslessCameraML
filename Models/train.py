@@ -173,24 +173,20 @@ def train(args, model, device, checkpoint):
 def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None):
     data_transforms = []
 
-    # if Bias is not None:
-    #     data_transforms.append([BiasNoise(Bias)])
-    # if Shift is not None:
-    #     if 't' in args.type_shift and 'p' in args.type_shift:
-    #         shift_t = [TranslateImage(args.shift, 0, random= args.rigor),
-    #                 PeriodicShift(args.shift, random= args.rigor)]
-    #     elif 't' in args.type_shift:
-    #         shift_t = [TranslateImage(args.shift, 0, random= args.rigor)]
-    #     elif 'p' in args.type_shift:
-    #         shift_t = [PeriodicShift(args.shift, random= args.rigor)]
-
-    #     data_transforms.append(shift_t)
-    # if Gaussian is not None:
-    #     data_transforms.append([GaussianNoise(Gaussian)])
-
-    data_transforms.append([PeriodicShift(10)])
-    data_transforms.append([PeriodicShift(25)])
-    data_transforms.append([PeriodicShift(50)])
+    if Bias is not None:
+        data_transforms.append([BiasNoise(Bias)])
+    if Shift is not None:
+        if 't' in args.type_shift and 'p' in args.type_shift:
+            shift_t = [TranslateImage(args.shift, 0, random= args.rigor),
+                    PeriodicShift(args.shift, random= args.rigor)]
+        elif 't' in args.type_shift:
+            shift_t = [TranslateImage(args.shift, 0, random= args.rigor)]
+        elif 'p' in args.type_shift:
+            shift_t = [PeriodicShift(args.shift, random= args.rigor)]
+            
+        data_transforms.append(shift_t)
+    if Gaussian is not None:
+        data_transforms.append([GaussianNoise(Gaussian)])
 
     for d_transform in data_transforms:
         data_transform = [transforms.Resize((args.resize, args.resize)),
