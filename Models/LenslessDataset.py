@@ -10,16 +10,16 @@ from PIL import Image
 import random
 
 '''
-Dataset for the lensless images.
-The csv file must contain the relative path to the images
-The root dir must be the top level directory of where all of the images.
+    Dataset for the lensless images.
+    The csv file must contain the relative path to the images
+    The root dir must be the top level directory of where all of the images.
 
-Bare transform is a list of image transformations. These transformations will be taken as is, if and only if
-extra_transform is None. If extra_transform is not none then bare_transform MUST contain a None entry where the
-extra transforms will be placed. 
+    Bare transform is a list of image transformations. These transformations will be taken as is, if and only if
+    extra_transform is None. If extra_transform is not none then bare_transform MUST contain a None entry where the
+    extra transforms will be placed. 
 
-The extra transforms are a list of more image transformations. These transformations are randomly chosen. The
-random selection either contains one of the transformations or all of them.
+    The extra transforms are a list of more image transformations. These transformations are randomly chosen. The
+    random selection either contains one of the transformations or all of them.
 '''
 class LenslessDataset(Dataset):
     def __init__(self, csv_file, root_dir, bare_transform = None, extra_transform = None):

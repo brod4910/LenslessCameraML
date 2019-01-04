@@ -68,6 +68,10 @@ def CreateArgsParser():
 
     return parser
 
+'''
+    Runs the entire training process of the model. The model is chosen from models.py and is selected from the
+    arguments passed in at run time.
+'''
 def main():
     args = CreateArgsParser().parse_args()
     checkpoint = None

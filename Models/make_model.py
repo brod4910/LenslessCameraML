@@ -4,6 +4,11 @@ import torch.nn.functional as F
 from torch.utils.checkpoint import checkpoint_sequential
 from torch.utils.checkpoint import checkpoint
 
+'''
+    Creates a model with feature layers, and classifying layers. The model uses
+    a dummy model to tie the input to dummy tensor so if checkpointing is used, the model
+    won't have zero gradients at its input. This is a must if the model is checkpointed.
+'''
 class Model(nn.Module):
 
     def __init__(self, feature_layers, classifier, checkpoint= False):
@@ -25,7 +30,11 @@ class Model(nn.Module):
         input_var = self.classifier(input_var)
         return input_var
 
-
+'''
+    Model wrapper that is used when checkpointing. The model takes the desired feature layers
+    and performs the forward pass for the feature layers. This is so that the model doesn't have
+    zero gradients at its input.
+'''
 class ModuleWrapperIgnores2ndArg(nn.Module):
     def __init__(self, module):
         super().__init__()
@@ -36,6 +45,14 @@ class ModuleWrapperIgnores2ndArg(nn.Module):
         x = self.module(x)
         return x
 
+'''
+    Creates the model layers depending on the arrays of layers that are passed into layout.
+    An array layer is as follows:
+        Convolution: ['C', in_channels, out_channels, (kernel), stride, dilation, padding, Activation Function]
+        Max Pooling: ['M', (kernel), stride, padding]
+        Average Pooling: ['A', (kernel), stride, padding]
+        Possible Activation Fns: 'ReLU', 'ReLU_NoB2d', 'Sigmoid', 'Sigmoid_NoB2d','PReLU', 'SELU', 'LeakyReLU', 'None'->(Contains no Batch Norm for dimensionality reduction 1x1 kernels)
+'''
 def make_layers(layout, upsample= False):
     layers = []
 
@@ -86,6 +103,16 @@ def make_layers(layout, upsample= False):
 
     return nn.Sequential(*layers)
 
+'''
+    Creates the classifying layers depending on the arrays of layers that are passed into layout.
+    An array layer is as follows:
+        Linear Layer: ['L', in_features, out_features, Activation Function]
+        Dropout : ['D', probability]
+        Dropout 2D : ['D2d', propability]
+        Alpha Dropout : ['AD', probability]
+        Classifying layer: ['FC', in_features, num_classes]
+        Possible Activation Fns: 'ReLU', 'PReLU', 'SELU', 'LeakyReLU', 'None'->(Contains no Batch Norm for dimensionality reduction 1x1 kernels)
+'''
 def make_classifier_layers(layout):
     layers = []
     for layer in layout:
@@ -112,55 +139,4 @@ def make_classifier_layers(layout):
             layers += [nn.Linear(layer[1], layer[2])]
 
     return nn.Sequential(*layers)
-
-
-# import torch
-# import torch.nn as nn
-# import torch.nn.functional as F
-# from torch.utils.checkpoint import checkpoint_sequential
-
-# def make_layers(layout, checkpoint= False):
-#     layers = []
-
-#     for layer in layout:
-#         if layer[0] == 'A':
-#             layers += [nn.AvgPool2d(kernel_size= (layer[1][0], layer[1][1]), stride= layer[2], padding= layer[3])]
-#         elif layer[0] == 'M':
-#             layers += [nn.MaxPool2d(kernel_size= (layer[1][0], layer[1][1]), stride= layer[2], padding= layer[3])]
-#         elif layer[0] == 'C':
-#             conv2d = nn.Conv2d(in_channels= layer[1], out_channels= layer[2], 
-#                 kernel_size= (layer[3][0], layer[3][1]), stride= layer[4], padding= layer[5])
-#             if layer[6] == 'ReLU':
-#                 layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.ReLU(inplace= True)]
-#             elif layer[6] == 'PReLU':
-#                 layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.PReLU(inplace= True)]
-#             elif layer[6] == 'SELU':
-#                 layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.SELU(inplace= True)]
-#             elif layer[6] == 'LeakyReLU':
-#                 layers += [conv2d, nn.BatchNorm2d(layer[2]), nn.LeakyReLU(inplace= True)]
-#             else:
-#                 layers += [conv2d]
-
-#     return nn.Sequential(*layers)
-
-# def make_classifier_layers(layout):
-#     layers = []
-#     for layer in layout:
-#         if layer[0] == 'L':
-#             if layer[3] == 'ReLU':
-#                 layers += [nn.Linear(layer[1], layer[2]), nn.BatchNorm1d(layer[2]), nn.ReLU(inplace= True)]
-#             elif layer[3] == 'PReLU':
-#                 layers += [nn.Linear(layer[1], layer[2]), nn.BatchNorm1d(layer[2]), nn.PReLU(inplace= True)]
-#             elif layer[3] == 'SELU':
-#                 layers += [nn.Linear(layer[1], layer[2]), nn.BatchNorm1d(layer[2]), nn.SELU(inplace= True)]
-#             elif layer[3] == 'LeakyReLU':
-#                 layers += [nn.Linear(layer[1], layer[2]), nn.BatchNorm1d(layer[2]), nn.LeakyReLU(inplace= True)]
-#         elif layer[0] == 'D':
-#             layers += [nn.Dropout(layer[1])]
-#         elif layer[0] == 'AD':
-#             layers+= [nn.AlphaDropout(layer[1])]
-#         elif layer[0] == 'FC':
-#             layers += [nn.Linear(layer[1], layer[2])]
-
-#     return nn.Sequential(*layers)
 

@@ -13,34 +13,22 @@ from torch.utils.data import ConcatDataset
 from sklearn.model_selection import KFold
 import numpy as np
 
+'''
+    The main train function that combines model setup, training, testing, and extra rigor evaluation
+
+    params:
+        args: Arguments which contain the required information for model setup, training, and testing
+        model: Model to be trained, tested, and evaluated
+        device: device to send the data to while training, testing and evaluating (e.g cpu, cuda, cuda:0, cuda:1, etc)
+        checkpoint: If the model is being reloaded then checkpoint will not be none, otherwise ignore checkpoint
+'''
 def train(args, model, device, checkpoint):
 
+    # Data transforms list 
     data_transforms = []
-    # Data transformations
-    # if args.hflip is True and args.vflip is False:
-    #     data_transform = transforms.Compose([
-    #         transforms.Resize((args.resize, args.resize)),
-    #         transforms.RandomHorizontalFlip(),
-    #         transforms.ToTensor()
-    #         ])
-    # elif args.vflip is True and args.hflip is False:
-    #     data_transform = transforms.Compose([
-    #         transforms.Resize((args.resize, args.resize)),
-    #         transforms.RandomVerticalFlip(),
-    #         transforms.ToTensor()
-    #         ])
-    # elif args.vflip is True and args.hflip is True:
-    #     data_transform = transforms.Compose([
-    #         transforms.Resize((args.resize, args.resize)),
-    #         transforms.RandomHorizontalFlip(),
-    #         transforms.RandomVerticalFlip(),
-    #         transforms.ToTensor()
-    #         ])
-    # else:
-    # data_transforms += [BiasNoise(Bias)]
-    # data_transforms += [TranslateImage(Shift[0], Shift[1])]
-    # data_transforms += [GaussianNoise(Gaussian)]
 
+    # Conduct rigorous tests if the args contain rigor
+    # The tests can test periodic, translation or both
     if args.rigor:
         if 't' in args.type_shift and 'p' in args.type_shift:
             shift_t = [TranslateImage(args.shift, 0, random= args.rigor),
@@ -58,6 +46,7 @@ def train(args, model, device, checkpoint):
                         [GaussianNoise(args.gaussian),
                         *shift_t]))
 
+    # The transform to be appended for normal testing
     data_transforms.append((
         [transforms.Resize((args.resize, args.resize)),
         MaxNormalization(0.0038910505836575876),
@@ -72,6 +61,8 @@ def train(args, model, device, checkpoint):
     train_datasets = []
     test_datasets = []
 
+    # for each transform create its respective dataset and append to
+    # its respect list
     for idx, (b, e) in enumerate(data_transforms):
         train_datasets.append(LenslessDataset.LenslessDataset(
         csv_file= args.train_csv,
@@ -85,6 +76,7 @@ def train(args, model, device, checkpoint):
         bare_transform = b,
         extra_transform = e))
 
+    # Concatenate each dataset to create a joined dataset
     train_loader = torch.utils.data.DataLoader(
     ConcatDataset(train_datasets), 
     batch_size= args.batch_size, 
@@ -113,13 +105,14 @@ def train(args, model, device, checkpoint):
     elif args.optimizer == 'Adam':
         optimizer = optim.Adam(model.parameters(), lr=args.lr, betas=(0.9, 0.999), eps=1e-08, weight_decay=0, amsgrad=False)
 
+    # check for a checkpoint
     if checkpoint is not None:
         optimizer.load_state_dict(checkpoint['optimizer'])
 
     print("\nUsing optimizer: %s" % (args.optimizer))
 
+    # set the Loss function as CrossEntropy
     if args.loss_fn == 'CELoss':
-        # set the Loss function as CrossEntropy
         criterion = torch.nn.CrossEntropyLoss().cuda() if device == "cuda" else torch.nn.CrossEntropyLoss()
     elif args.loss_fn == 'MMLoss':
         criterion = torch.nn.MultiMarginLoss().cuda() if device == "cuda" else torch.nn.MultiMarginLoss()
@@ -137,8 +130,9 @@ def train(args, model, device, checkpoint):
 
     del checkpoint
 
-    # train and validate the model accordingly
     total_time = time.clock()
+
+    # train and validate the model accordingly
     for epoch in range(args.start_epoch, args.epochs + 1):
         train_epoch(epoch, args, model, optimizer, criterion, train_loader, device)
         test_loss, accuracy = test_epoch(model, test_loader, device)
@@ -167,9 +161,26 @@ def train(args, model, device, checkpoint):
 
         is_best = False
 
+        # evalute the model with transforms of a certain type or rigor evaluation
+        # depending on if args contains certain transforms
         print("Evaluating model at epoch: {}".format(epoch))
         evaluate_model(model, device, args, Bias=args.bias, Shift= (args.shift, 0), Gaussian=args.gaussian)
 
+'''
+    Evaluates the model depnding on if Bias, Shift or Gaussian are not None.
+    The function evaluates the model using 4 different transforms, where shift can be either periodic shift, 
+    translation or both. Each transform happens independently of each other, meaning that the model is 
+    evaluated separately for each transform.
+
+    params:
+        model: Model to be evaluated
+        device: device to send the data to while evaluating (e.g cpu, cuda, cuda:0, cuda:1, etc)
+        args: Arguments which contain the required information for evaluation
+        Bias: Contains bias to add constant noise to each image
+        Shift: Shift constant to shift images by. (UNUSED: the value itself is 
+                unused but needs to be present for shifting to occur)
+        Gaussian: Std to be used during evaluation
+'''
 def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None):
     data_transforms = []
 
@@ -183,7 +194,7 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
             shift_t = [TranslateImage(args.shift, 0, random= args.rigor)]
         elif 'p' in args.type_shift:
             shift_t = [PeriodicShift(args.shift, random= args.rigor)]
-            
+
         data_transforms.append(shift_t)
     if Gaussian is not None:
         data_transforms.append([GaussianNoise(Gaussian)])
@@ -212,7 +223,19 @@ def evaluate_model(model, device, args, Bias= None, Shift= None, Gaussian= None)
 
         test_epoch(model, test_loader, device)
 
-def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, accumulation_steps= 16):
+'''
+    Trains the given model for a single epoch of the training data.
+
+    params:
+        epoch: The epoch the model is currently on
+        args: arguments which contain required information for training
+        model: The model to be trained
+        optimizer: The optimizer that will update the model on the backward pass
+        criterion: The loss function that is used to calculate the model's predictions
+        train_loader: The training loader for the dataset being trained on
+        device: Device to send the data to while training (e.g cpu, cuda, cuda:0, cuda:1, etc)
+'''
+def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device):
     model.train()
 
     total_train_loss = 0
@@ -231,26 +254,26 @@ def train_epoch(epoch, args, model, optimizer, criterion, train_loader, device, 
         loss.backward()
         optimizer.step()
 
-        # batch_loss += loss.item()
         total_train_loss += loss.item()
-
-        # if (batch_idx + 1) % accumulation_steps == 0:             # Wait for several backward steps
-        #     optimizer.step()                            # Now we can do an optimizer step
-        #     optimizer.zero_grad()
 
         if (batch_idx + 1) % args.log_interval == 0:
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(inputs), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader.dataset), loss.item()))
-        # report the train metrics depending on the log interval
-
-        #     batch_loss = 0 
 
         del inputs, targets, loss, output
 
     total_train_loss /= len(train_loader.dataset)
     print('\nAveraged loss for training epoch: {:.4f}'.format(total_train_loss))
 
+'''
+    Tests the given model for a single epoch of the testing data.
+
+    params:
+        model: The model in question
+        test_loader: The testing loader for the dataset being tested against
+        device: Device to send the data to while testing (e.g cpu, cuda, cuda:0, cuda:1, etc)
+'''
 def test_epoch(model, test_loader, device):
     model.eval()
     test_loss = 0
@@ -280,6 +303,14 @@ def test_epoch(model, test_loader, device):
 
     return test_loss, accuracy
 
+'''
+    Checkpoints a model 
+
+    params: 
+        state: The model to save
+        is_best: Boolean that contains true or false depending on if the model is better than the previously saved
+        filename: name of the file to save the model
+'''
 def save_checkpoint(state, is_best, filename='checkpoint.pth.tar'):
     torch.save(state, filename)
     if is_best:
